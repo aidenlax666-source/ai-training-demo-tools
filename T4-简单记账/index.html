@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <title>简单记账 · 预算 vs 已花</title>
+  <style>
+    :root {
+      /* 【改这里①】主题色 */
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --ok: #16a34a;
+      --warn: #ea580c;
+      --danger: #dc2626;
+      --bg: #f0fdfa;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(13, 148, 136, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: linear-gradient(160deg, #ecfdf5 0%, #f8fafc 50%, #f0fdfa 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 16px 14px 48px; }
+    header.app { text-align: center; padding: 18px 8px 8px; }
+    header.app h1 { margin: 0; font-size: 1.55rem; color: var(--primary-dark); }
+    header.app p { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+    nav.tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin: 16px 0 20px;
+    }
+    nav.tabs button {
+      border: 2px solid var(--border); background: #fff; color: var(--text);
+      border-radius: 999px; padding: 10px 16px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer;
+    }
+    nav.tabs button.active {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card-box {
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px; border: 1px solid var(--border); margin-bottom: 14px;
+    }
+    label { display: block; font-weight: 600; margin: 12px 0 6px; font-size: 0.95rem; }
+    input[type="text"], input[type="number"], input[type="date"], input[type="url"],
+    textarea, select {
+      width: 100%; padding: 12px 14px; font-size: 1rem; border: 2px solid var(--border);
+      border-radius: 12px; background: #fff; color: var(--text);
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 18px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; background: var(--primary); color: #fff;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-ok { background: var(--ok); }
+    .btn-warn { background: var(--warn); }
+    .btn-danger { background: var(--danger); }
+    .btn-sm { padding: 8px 12px; font-size: 0.9rem; }
+    .btn-ghost { background: #f1f5f9; color: var(--text); }
+    .hint { color: var(--muted); font-size: 0.88rem; margin: 8px 0; }
+    .warn-box {
+      background: #fff7ed; border: 1px solid #fdba74; color: #9a3412;
+      border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0;
+      display: none;
+    }
+    .readonly-banner {
+      background: #ecfeff; border: 1px solid #67e8f9; color: #155e75;
+      border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0;
+      display: none;
+    }
+    .stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px;
+    }
+    @media (max-width: 520px) {
+      .stats { grid-template-columns: 1fr; }
+    }
+    .stat {
+      background: #f8fafc; border-radius: 14px; padding: 14px 12px; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .stat .label { color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+    .stat .value { font-size: 1.45rem; font-weight: 800; margin-top: 4px; word-break: break-all; }
+    .stat.remain-ok .value { color: var(--ok); }
+    .stat.remain-warn .value { color: var(--danger); }
+    .progress-wrap {
+      background: #e2e8f0; border-radius: 999px; height: 18px; overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-bar {
+      height: 100%; width: 0%; background: var(--ok); border-radius: 999px;
+      transition: width 0.25s ease, background 0.25s ease;
+    }
+    .progress-bar.over { background: var(--danger); }
+    .progress-label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .list { list-style: none; padding: 0; margin: 0; }
+    .list li {
+      display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+      padding: 12px; border-bottom: 1px solid var(--border);
+    }
+    .list li:last-child { border-bottom: none; }
+    .list .meta { flex: 1; min-width: 0; }
+    .list .amount { font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); white-space: nowrap; }
+    .list .cat {
+      display: inline-block; background: #ccfbf1; color: #115e59;
+      border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; font-weight: 600;
+      margin-right: 6px;
+    }
+    .list .note { color: var(--muted); font-size: 0.9rem; margin-top: 2px; word-break: break-word; }
+    .list .date { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+    .empty { text-align: center; color: var(--muted); padding: 24px 8px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+    footer.tiny { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app">
+      <h1>简单记账</h1>
+      <p>预算 vs 已花 · 给自己 / 家人用</p>
+    </header>
+
+    <div id="localhostWarn" class="warn-box">
+      ⚠️ 当前是本机地址（localhost / 127.0.0.1）。复制出来的链接<strong>只有你自己电脑能打开</strong>。
+      正式分享请用<strong>公网地址</strong>，或在下方「分享基址」填好公网 URL 再复制。
+    </div>
+    <div id="readonlyBanner" class="readonly-banner">
+      👀 你正在看<strong>分享只读总览</strong>（链接带 <code>#b=</code>）。改账请打开公网首页自己记账；本页不会写入你的本机账本。
+      <div class="row"><button type="button" class="btn btn-sm btn-outline" onclick="exitReadonly()">回到可编辑首页</button></div>
+    </div>
+
+    <nav class="tabs" id="tabs" role="tablist">
+      <button type="button" class="active" data-tab="home" onclick="showTab('home')">总览</button>
+      <button type="button" data-tab="add" onclick="showTab('add')">记一笔</button>
+      <button type="button" data-tab="budget" onclick="showTab('budget')">预算</button>
+      <button type="button" data-tab="share" onclick="showTab('share')">备份/分享</button>
+    </nav>
+
+    <!-- 总览 -->
+    <section id="panel-home" class="panel active">
+      <div class="card-box">
+        <div class="deck-title" id="bookTitle" style="font-size:1.15rem;font-weight:700;margin-bottom:10px;">本月账本</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">月预算</div>
+            <div class="value" id="statBudget">¥0</div>
+          </div>
+          <div class="stat">
+            <div class="label">已花</div>
+            <div class="value" id="statSpent">¥0</div>
+          </div>
+          <div class="stat" id="statRemainBox">
+            <div class="label">剩余</div>
+            <div class="value" id="statRemain">¥0</div>
+          </div>
+        </div>
+        <div class="progress-label" id="progressLabel">已用 0%</div>
+        <div class="progress-wrap" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="hint" id="overHint" style="display:none;color:var(--danger);font-weight:700;">已超支，注意一下开销哦。</p>
+      </div>
+      <div class="card-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <strong style="font-size:1.05rem;">支出明细</strong>
+          <button type="button" class="btn btn-sm btn-outline" onclick="showTab('add')" id="btnGoAdd">＋ 记一笔</button>
+        </div>
+        <ul class="list" id="expenseList"></ul>
+        <div class="empty" id="emptyHint" style="display:none;">还没有支出，去「记一笔」吧。</div>
+      </div>
+    </section>
+
+    <!-- 记一笔 -->
+    <section id="panel-add" class="panel">
+      <div class="card-box">
+        <label for="expAmount">金额（元）</label>
+        <input type="number" id="expAmount" min="0.01" step="0.01" placeholder="例如 28.5" inputmode="decimal" />
+        <div class="grid2">
+          <div>
+            <label for="expCategory">分类</label>
+            <select id="expCategory">
+              <option>餐饮</option>
+              <option>交通</option>
+              <option>购物</option>
+              <option>居住</option>
+              <option>娱乐</option>
+              <option>学习</option>
+              <option>医疗</option>
+              <option>其他</option>
+            </select>
+          </div>
+          <div>
+            <label for="expDate">日期</label>
+            <input type="date" id="expDate" />
+          </div>
+        </div>
+        <label for="expNote">备注（可选）</label>
+        <input type="text" id="expNote" placeholder="例如：午餐外卖" maxlength="80" />
+        <div class="row">
+          <button type="button" class="btn btn-ok" onclick="addExpense()">保存支出</button>
+          <button type="button" class="btn btn-ghost" onclick="resetAddForm()">清空</button>
+        </div>
+        <p class="hint">保存后会立刻更新「总览」里的已花与剩余。</p>
+      </div>
+    </section>
+
+    <!-- 预算 -->
+    <section id="panel-budget" class="panel">
+      <div class="card-box">
+        <label for="bookName">账本名称</label>
+        <input type="text" id="bookName" placeholder="例如：2026年10月" maxlength="40" />
+        <label for="budgetInput">月预算总额（元）</label>
+        <input type="number" id="budgetInput" min="0" step="1" placeholder="例如 3000" inputmode="decimal" />
+        <div class="row">
+          <button type="button" class="btn" onclick="saveBudget()">保存预算</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="loadDemo()">载入示范账本</button>
+        </div>
+        <p class="hint">预算与支出都保存在本机浏览器（localStorage）。换手机 / 清缓存前请先导出备份。</p>
+      </div>
+    </section>
+
+    <!-- 备份/分享 -->
+    <section id="panel-share" class="panel">
+      <div class="card-box">
+        <strong>本机备份</strong>
+        <p class="hint">导出 JSON 可存到网盘；导入可恢复。推荐作为主备份方式。</p>
+        <div class="row">
+          <button type="button" class="btn btn-outline" onclick="exportJson()">导出 JSON</button>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('importFile').click()">导入 JSON</button>
+          <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn-ok" onclick="copyBackupText()">复制本机备份（文本）</button>
+        </div>
+        <label for="pasteBox">或粘贴 JSON 导入</label>
+        <textarea id="pasteBox" placeholder='{"title":"...","budget":3000,"expenses":[...]}'></textarea>
+        <div class="row">
+          <button type="button" class="btn btn-sm" onclick="importPaste()">从文本导入</button>
+        </div>
+      </div>
+      <div class="card-box">
+        <strong>分享只读总览（可选）</strong>
+        <p class="hint">把当前账本编码进链接的 <code>#b=</code>，对方打开只能看总览与明细，不能改你的本机数据。笔数多时链接会变长，建议单次分享 <strong>≤40 笔</strong>。</p>
+        <label for="shareBase">分享基址（公网地址，可选）</label>
+        <input type="url" id="shareBase" placeholder="https://你的公网地址/" />
+        <p class="hint">若你在本机调试，可填公网基址，复制出的链接就会用公网域名，而不是 127.0.0.1。</p>
+        <div class="row">
+          <button type="button" class="btn" onclick="copyShareLink()">复制分享链接（#b=）</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="copyEmptyTemplate()">复制「空模板」说明链接</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="tiny">数据仅存本机 · 培训示范小工具 · 非银行级账务系统</footer>
+  </div>
+
+  <script>
+  /* 【改这里②】示范账本：改数字就能当自己的模板 */
+  const BUILTIN = {
+    title: "示范 · 本月生活费",
+    budget: 3000,
+    expenses: [
+      { id: "d1", amount: 28.5, category: "餐饮", note: "午餐外卖", date: "2026-10-15" },
+      { id: "d2", amount: 12, category: "交通", note: "地铁", date: "2026-10-15" },
+      { id: "d3", amount: 89, category: "购物", note: "日用品", date: "2026-10-14" },
+      { id: "d4", amount: 45, category: "娱乐", note: "电影", date: "2026-10-12" }
+    ]
+  };
+
+  const STORAGE_KEY = "t4_budget_book_v1";
+  const CATEGORIES = ["餐饮", "交通", "购物", "居住", "娱乐", "学习", "医疗", "其他"];
+
+  let state = { title: "本月账本", budget: 0, expenses: [] };
+  let readonlyMode = false;
+
+  function money(n) {
+    const x = Number(n) || 0;
+    return "¥" + x.toLocaleString("zh-CN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+
+  function todayStr() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function uid() {
+    return "e" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return null;
+      return {
+        title: String(o.title || "本月账本"),
+        budget: Number(o.budget) || 0,
+        expenses: Array.isArray(o.expenses) ? o.expenses.map(normalizeExp).filter(Boolean) : []
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function normalizeExp(e) {
+    if (!e || typeof e !== "object") return null;
+    const amount = Number(e.amount);
+    if (!(amount > 0)) return null;
+    return {
+      id: String(e.id || uid()),
+      amount: Math.round(amount * 100) / 100,
+      category: String(e.category || "其他").slice(0, 20),
+      note: String(e.note || "").slice(0, 80),
+      date: String(e.date || todayStr()).slice(0, 12)
+    };
+  }
+
+  function saveState() {
+    if (readonlyMode) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      title: state.title,
+      budget: state.budget,
+      expenses: state.expenses
+    }));
+  }
+
+  function isLocalHost() {
+    const h = location.hostname;
+    return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "0.0.0.0" || h === "";
+  }
+
+  function updateLocalhostWarn() {
+    const box = document.getElementById("localhostWarn");
+    if (box) box.style.display = isLocalHost() ? "block" : "none";
+  }
+
+  function spentTotal() {
+    return state.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  }
+
+  function render() {
+    document.getElementById("bookTitle").textContent = state.title || "本月账本";
+    const budget = Number(state.budget) || 0;
+    const spent = spentTotal();
+    const remain = budget - spent;
+    document.getElementById("statBudget").textContent = money(budget);
+    document.getElementById("statSpent").textContent = money(spent);
+    document.getElementById("statRemain").textContent = money(remain);
+    const box = document.getElementById("statRemainBox");
+    box.classList.remove("remain-ok", "remain-warn");
+    box.classList.add(remain < 0 ? "remain-warn" : "remain-ok");
+
+    let pct = 0;
+    if (budget > 0) pct = Math.min(999, (spent / budget) * 100);
+    else if (spent > 0) pct = 100;
+    const bar = document.getElementById("progressBar");
+    const over = budget > 0 ? spent > budget : spent > 0 && budget === 0;
+    bar.style.width = Math.min(100, pct) + "%";
+    bar.classList.toggle("over", over || remain < 0);
+    document.getElementById("progressLabel").textContent =
+      budget > 0 ? ("已用 " + pct.toFixed(1).replace(/\.0$/, "") + "%") : (spent > 0 ? "尚未设置预算" : "已用 0%");
+    document.getElementById("overHint").style.display = remain < 0 ? "block" : "none";
+
+    const list = document.getElementById("expenseList");
+    const empty = document.getElementById("emptyHint");
+    const sorted = state.expenses.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    list.innerHTML = "";
+    if (!sorted.length) {
+      empty.style.display = "block";
+    } else {
+      empty.style.display = "none";
+      sorted.forEach((e) => {
+        const li = document.createElement("li");
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML =
+          '<span class="cat"></span><strong></strong>' +
+          '<div class="note"></div><div class="date"></div>';
+        meta.querySelector(".cat").textContent = e.category;
+        meta.querySelector("strong").textContent = money(e.amount);
+        meta.querySelector(".note").textContent = e.note || "（无备注）";
+        meta.querySelector(".date").textContent = e.date;
+        const right = document.createElement("div");
+        right.style.display = "flex";
+        right.style.flexDirection = "column";
+        right.style.alignItems = "flex-end";
+        right.style.gap = "6px";
+        const amt = document.createElement("div");
+        amt.className = "amount";
+        amt.textContent = money(e.amount);
+        right.appendChild(amt);
+        if (!readonlyMode) {
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "btn btn-sm btn-danger";
+          del.textContent = "删除";
+          del.onclick = () => deleteExpense(e.id);
+          right.appendChild(del);
+        }
+        li.appendChild(meta);
+        li.appendChild(right);
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById("bookName").value = state.title || "";
+    document.getElementById("budgetInput").value = budget || "";
+    document.getElementById("btnGoAdd").style.display = readonlyMode ? "none" : "";
+    document.getElementById("readonlyBanner").style.display = readonlyMode ? "block" : "none";
+
+    // disable edit tabs visually in readonly
+    document.querySelectorAll("#tabs button").forEach((btn) => {
+      const t = btn.getAttribute("data-tab");
+      if (readonlyMode && (t === "add" || t === "budget")) {
+        btn.disabled = true;
+        btn.style.opacity = "0.45";
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = "";
+      }
+    });
+  }
+
+  function showTab(name) {
+    if (readonlyMode && (name === "add" || name === "budget")) {
+      alert("只读分享页不能改账。请点「回到可编辑首页」或打开公网正式链接。");
+      return;
+    }
+    document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+    document.querySelectorAll("#tabs button").forEach((b) => b.classList.remove("active"));
+    const panel = document.getElementById("panel-" + name);
+    if (panel) panel.classList.add("active");
+    const btn = document.querySelector('#tabs button[data-tab="' + name + '"]');
+    if (btn) btn.classList.add("active");
+  }
+
+  function resetAddForm() {
+    document.getElementById("expAmount").value = "";
+    document.getElementById("expNote").value = "";
+    document.getElementById("expCategory").value = "餐饮";
+    document.getElementById("expDate").value = todayStr();
+  }
+
+  function addExpense() {
+    if (readonlyMode) return;
+    const amount = Number(document.getElementById("expAmount").value);
+    if (!(amount > 0)) {
+      alert("请填写大于 0 的金额");
+      return;
+    }
+    const exp = {
+      id: uid(),
+      amount: Math.round(amount * 100) / 100,
+      category: document.getElementById("expCategory").value || "其他",
+      note: document.getElementById("expNote").value.trim(),
+      date: document.getElementById("expDate").value || todayStr()
+    };
+    state.expenses.push(exp);
+    saveState();
+    resetAddForm();
+    render();
+    showTab("home");
+  }
+
+  function deleteExpense(id) {
+    if (readonlyMode) return;
+    if (!confirm("确定删除这笔支出？")) return;
+    state.expenses = state.expenses.filter((e) => e.id !== id);
+    saveState();
+    render();
+  }
+
+  function saveBudget() {
+    if (readonlyMode) return;
+    const title = document.getElementById("bookName").value.trim() || "本月账本";
+    const budget = Number(document.getElementById("budgetInput").value);
+    if (!(budget >= 0)) {
+      alert("请填写有效的预算金额（可以是 0）");
+      return;
+    }
+    state.title = title;
+    state.budget = Math.round(budget * 100) / 100;
+    saveState();
+    render();
+    showTab("home");
+    alert("预算已保存");
+  }
+
+  function loadDemo() {
+    if (readonlyMode) return;
+    if (!confirm("载入示范账本会覆盖当前本机数据，确定？")) return;
+    state = {
+      title: BUILTIN.title,
+      budget: BUILTIN.budget,
+      expenses: BUILTIN.expenses.map((e) => Object.assign({}, e))
+    };
+    saveState();
+    render();
+    showTab("home");
+  }
+
+  function bookPayload() {
+    return {
+      title: state.title,
+      budget: state.budget,
+      expenses: state.expenses
+    };
+  }
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(bookPayload(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = (state.title || "账本").replace(/[\\/:*?"<>|]/g, "_") + ".json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  async function copyBackupText() {
+    const text = JSON.stringify(bookPayload(), null, 2);
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("本机备份文本已复制。可粘贴到备忘录 / 网盘。");
+    } catch (e) {
+      prompt("请手动复制：", text);
+    }
+  }
+
+  function applyBook(o, persist) {
+    state = {
+      title: String(o.title || "本月账本"),
+      budget: Number(o.budget) || 0,
+      expenses: Array.isArray(o.expenses) ? o.expenses.map(normalizeExp).filter(Boolean) : []
+    };
+    if (persist && !readonlyMode) saveState();
+    render();
+  }
+
+  function importPaste() {
+    if (readonlyMode) {
+      alert("只读模式请先回到可编辑首页");
+      return;
+    }
+    const t = document.getElementById("pasteBox").value.trim();
+    if (!t) {
+      alert("请先粘贴 JSON");
+      return;
+    }
+    try {
+      const o = JSON.parse(t);
+      applyBook(o, true);
+      document.getElementById("pasteBox").value = "";
+      showTab("home");
+      alert("导入成功");
+    } catch (e) {
+      alert("JSON 格式不对：" + e.message);
+    }
+  }
+
+  document.getElementById("importFile").addEventListener("change", (ev) => {
+    if (readonlyMode) return;
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const o = JSON.parse(String(reader.result || ""));
+        applyBook(o, true);
+        showTab("home");
+        alert("导入成功");
+      } catch (e) {
+        alert("导入失败：" + e.message);
+      }
+      ev.target.value = "";
+    };
+    reader.readAsText(f, "utf-8");
+  });
+
+  function encodeBook(book) {
+    const json = JSON.stringify(book);
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    bytes.forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+
+  function decodeBook(hashBody) {
+    let b64 = hashBody.replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+
+  function getShareOrigin() {
+    const box = document.getElementById("shareBase");
+    const custom = (box && box.value || "").trim().replace(/\/+$/, "");
+    if (custom) return custom;
+    return location.origin + location.pathname.replace(/\/index\.html$/i, "/").replace(/\/?$/, "/");
+  }
+
+  async function copyShareLink() {
+    if (state.expenses.length > 40) {
+      if (!confirm("当前超过 40 笔，分享链接可能很长甚至被聊天软件截断。仍要复制？")) return;
+    }
+    const origin = getShareOrigin();
+    if (isLocalHost() && !document.getElementById("shareBase").value.trim()) {
+      if (!confirm("当前是本机地址，同学打不开。建议先填「分享基址」或到公网页面再复制。仍要复制本机链接？")) return;
+    }
+    const hash = "#b=" + encodeBook(bookPayload());
+    const url = origin.replace(/\/?$/, "/") + hash;
+    try {
+      await navigator.clipboard.writeText(url);
+      alert("分享链接已复制！\n对方打开可看只读总览（含 #b=）。\n请确认不是 127.0.0.1。");
+    } catch (e) {
+      prompt("请手动复制：", url);
+    }
+  }
+
+  async function copyEmptyTemplate() {
+    const origin = getShareOrigin();
+    const url = origin.replace(/\/?$/, "/");
+    const tip =
+      "简单记账空模板（请打开后自己设预算、记支出）：\n" +
+      url +
+      "\n\n说明：这是工具首页，不是带账本数据的 #b= 链接。";
+    try {
+      await navigator.clipboard.writeText(tip);
+      alert("空模板说明已复制");
+    } catch (e) {
+      prompt("请手动复制：", tip);
+    }
+  }
+
+  function exitReadonly() {
+    readonlyMode = false;
+    history.replaceState(null, "", location.pathname + location.search);
+    const local = loadState();
+    state = local || {
+      title: BUILTIN.title,
+      budget: BUILTIN.budget,
+      expenses: BUILTIN.expenses.map((e) => Object.assign({}, e))
+    };
+    if (!local) saveState();
+    render();
+    showTab("home");
+  }
+
+  function bootFromHash() {
+    const h = location.hash || "";
+    if (h.startsWith("#b=")) {
+      try {
+        const o = decodeBook(h.slice(3));
+        readonlyMode = true;
+        applyBook(o, false);
+        showTab("home");
+        return true;
+      } catch (e) {
+        console.warn("hash decode failed", e);
+        alert("分享链接解析失败，已打开本机账本。");
+      }
+    }
+    return false;
+  }
+
+  function boot() {
+    updateLocalhostWarn();
+    document.getElementById("expDate").value = todayStr();
+    try {
+      const sb = sessionStorage.getItem("t4_share_base");
+      if (sb) document.getElementById("shareBase").value = sb;
+    } catch (e) {}
+    document.getElementById("shareBase").addEventListener("change", () => {
+      try {
+        sessionStorage.setItem("t4_share_base", document.getElementById("shareBase").value.trim());
+      } catch (e) {}
+    });
+
+    if (!bootFromHash()) {
+      const local = loadState();
+      if (local) {
+        state = local;
+      } else {
+        state = {
+          title: BUILTIN.title,
+          budget: BUILTIN.budget,
+          expenses: BUILTIN.expenses.map((e) => Object.assign({}, e))
+        };
+        saveState();
+      }
+      render();
+    }
+  }
+
+  boot();
+  </script>
+</body>
+</html>
