@@ -1,0 +1,10 @@
+{
+  "title": "示范卡组：英语单词",
+  "cards": [
+    { "front": "apple", "back": "苹果", "tag": "水果" },
+    { "front": "book", "back": "书", "tag": "学习" },
+    { "front": "happy", "back": "高兴的", "tag": "情绪" },
+    { "front": "How are you?", "back": "你好吗？", "tag": "口语" },
+    { "front": "thank you", "back": "谢谢", "tag": "口语" }
+  ]
+}

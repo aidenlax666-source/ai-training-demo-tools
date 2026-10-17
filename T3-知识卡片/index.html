@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <title>知识卡片 · 翻转学习</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --ok: #16a34a;
+      --warn: #ea580c;
+      --bg: #f0f4ff;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 50%, #ecfeff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 16px 14px 48px; }
+    header.app {
+      text-align: center;
+      padding: 18px 8px 8px;
+    }
+    header.app h1 { margin: 0; font-size: 1.6rem; color: var(--primary-dark); }
+    header.app p { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+    nav.tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin: 16px 0 20px;
+    }
+    nav.tabs button {
+      border: 2px solid var(--border); background: #fff; color: var(--text);
+      border-radius: 999px; padding: 10px 16px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer;
+    }
+    nav.tabs button.active {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card-box {
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px; border: 1px solid var(--border);
+    }
+    label { display: block; font-weight: 600; margin: 12px 0 6px; font-size: 0.95rem; }
+    input[type="text"], input[type="url"], textarea, select {
+      width: 100%; padding: 12px 14px; font-size: 1rem; border: 2px solid var(--border);
+      border-radius: 12px; background: #fff; color: var(--text);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 18px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; background: var(--primary); color: #fff;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-outline {
+      background: #fff; color: var(--primary); border: 2px solid var(--primary);
+    }
+    .btn-ok { background: var(--ok); }
+    .btn-warn { background: var(--warn); }
+    .btn-sm { padding: 8px 12px; font-size: 0.9rem; }
+    .btn-ghost { background: #f1f5f9; color: var(--text); }
+    .hint { color: var(--muted); font-size: 0.88rem; margin: 8px 0; }
+    .warn-box {
+      background: #fff7ed; border: 1px solid #fdba74; color: #9a3412;
+      border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0;
+      display: none;
+    }
+    .deck-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+    .list { list-style: none; padding: 0; margin: 0; }
+    .list li {
+      display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+      padding: 12px; border-bottom: 1px solid var(--border);
+    }
+    .list li:last-child { border-bottom: none; }
+    .list .meta { flex: 1; min-width: 0; }
+    .list .front { font-weight: 700; font-size: 1.05rem; word-break: break-word; }
+    .list .back-preview { color: var(--muted); font-size: 0.9rem; margin-top: 2px; word-break: break-word; }
+    .tag {
+      display: inline-block; background: #dbeafe; color: #1e40af;
+      border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; font-weight: 600;
+      margin-right: 6px;
+    }
+    .badge {
+      display: inline-block; border-radius: 8px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700;
+    }
+    .badge-ok { background: #dcfce7; color: #166534; }
+    .badge-review { background: #ffedd5; color: #9a3412; }
+    /* Flip card */
+    .study-stage { perspective: 1200px; margin: 12px 0; }
+    .flip-card {
+      width: 100%; min-height: 220px; position: relative;
+      transform-style: preserve-3d; transition: transform 0.45s ease;
+      cursor: pointer;
+    }
+    .flip-card.flipped { transform: rotateY(180deg); }
+    .face {
+      position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      border-radius: var(--radius); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px 18px; text-align: center;
+      border: 2px solid var(--border); box-shadow: var(--shadow); background: #fff;
+    }
+    .face.front { background: linear-gradient(145deg, #eff6ff, #fff); }
+    .face.back {
+      background: linear-gradient(145deg, #ecfdf5, #fff);
+      transform: rotateY(180deg);
+    }
+    .face .side-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.05em; }
+    .face .content { font-size: 1.45rem; font-weight: 700; word-break: break-word; white-space: pre-wrap; }
+    .progress { color: var(--muted); text-align: center; margin-bottom: 8px; font-size: 0.95rem; }
+    .empty { text-align: center; color: var(--muted); padding: 28px 12px; }
+    footer.tiny { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 28px; }
+    @media (max-width: 480px) {
+      html { font-size: 17px; }
+      .face .content { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app">
+      <h1>📇 知识卡片</h1>
+      <p>正面提问 · 翻面看答案 · 链接分享给同学</p>
+    </header>
+
+    <nav class="tabs" id="tabs">
+      <button type="button" class="active" data-tab="study">学习</button>
+      <button type="button" data-tab="list">卡组</button>
+      <button type="button" data-tab="edit">新建/编辑</button>
+      <button type="button" data-tab="share">分享/导入</button>
+    </nav>
+
+    <div id="localhostWarn" class="warn-box">
+      ⚠️ 当前是本机地址（localhost / 127.0.0.1）。复制出来的链接<strong>只有你自己电脑能打开</strong>。
+      请先打开<strong>公网地址</strong>再复制分享，或在下方填写「分享基址」。
+    </div>
+
+    <!-- 学习 -->
+    <section class="panel active" id="panel-study">
+      <div class="card-box">
+        <div class="deck-title" id="studyDeckTitle">示范卡组</div>
+        <div class="progress" id="studyProgress">0 / 0</div>
+        <div id="studyEmpty" class="empty" hidden>还没有卡片。去「新建/编辑」加几张，或点「分享/导入」载入示范。</div>
+        <div id="studyArea">
+          <div class="study-stage">
+            <div class="flip-card" id="flipCard" onclick="toggleFlip()" role="button" tabindex="0" aria-label="点击翻面">
+              <div class="face front">
+                <div class="side-label">正面 · 点一下翻面</div>
+                <div class="content" id="faceFront">—</div>
+                <div style="margin-top:12px" id="faceTag"></div>
+              </div>
+              <div class="face back">
+                <div class="side-label">背面 · 答案 / 讲解</div>
+                <div class="content" id="faceBack">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="justify-content:center">
+            <button type="button" class="btn btn-ghost" onclick="prevCard()">← 上一张</button>
+            <button type="button" class="btn btn-outline" onclick="toggleFlip()">翻面</button>
+            <button type="button" class="btn btn-ghost" onclick="nextCard()">下一张 →</button>
+          </div>
+          <div class="row" style="justify-content:center;margin-top:14px">
+            <button type="button" class="btn btn-ok" onclick="markStatus('remembered')">✓ 记住了</button>
+            <button type="button" class="btn btn-warn" onclick="markStatus('review')">↻ 再看</button>
+          </div>
+          <p class="hint" style="text-align:center">键盘：← → 换卡，空格翻面。手机可点卡片翻面。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 卡组列表 -->
+    <section class="panel" id="panel-list">
+      <div class="card-box">
+        <label>卡组名称</label>
+        <input type="text" id="deckTitleInput" placeholder="例如：英语单词 / 古诗默写" />
+        <div class="row">
+          <button type="button" class="btn btn-sm" onclick="saveDeckTitle()">保存名称</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="loadBuiltin()">载入示范卡组</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="clearMarks()">清除记住标记</button>
+        </div>
+        <p class="hint">点某张卡可跳到「学习」并从这张开始。本机自动保存到浏览器。</p>
+        <ul class="list" id="cardList"></ul>
+        <div id="listEmpty" class="empty" hidden>暂无卡片</div>
+      </div>
+    </section>
+
+    <!-- 新建/编辑 -->
+    <section class="panel" id="panel-edit">
+      <div class="card-box">
+        <input type="hidden" id="editId" value="" />
+        <label>正面（问题 / 标题）</label>
+        <textarea id="editFront" placeholder="例如：apple 或 静夜思第一句？"></textarea>
+        <label>背面（答案 / 讲解）</label>
+        <textarea id="editBack" placeholder="例如：苹果 或 床前明月光"></textarea>
+        <label>标签（可选）</label>
+        <input type="text" id="editTag" placeholder="例如：水果 / 唐诗" />
+        <div class="row">
+          <button type="button" class="btn" onclick="saveCard()">保存卡片</button>
+          <button type="button" class="btn btn-outline" onclick="resetEditForm()">清空表单</button>
+        </div>
+        <p class="hint">【改这里①】也可直接改同目录 <code>cards.json</code>，再点「分享/导入 → 从文件载入」。</p>
+      </div>
+    </section>
+
+    <!-- 分享/导入 -->
+    <section class="panel" id="panel-share">
+      <div class="card-box">
+        <div class="deck-title">公网分享</div>
+        <p class="hint">把当前卡组编码进链接的 <code>#c=</code>，同学打开就能学同一套卡。建议单次分享 <strong>≤30 张</strong>（链接过长可能被微信截断）。</p>
+        <label>分享基址（公网地址，可选）</label>
+        <input type="url" id="shareBase" placeholder="https://你的公网地址/" />
+        <div class="row">
+          <button type="button" class="btn" onclick="copyShareLink()">📋 复制分享链接</button>
+          <button type="button" class="btn btn-outline" onclick="exportJson()">导出 JSON</button>
+          <button type="button" class="btn btn-ghost" onclick="triggerImport()">导入 JSON</button>
+          <input type="file" id="importFile" accept=".json,application/json" hidden />
+        </div>
+        <p class="hint" id="shareHint">正式演示请用 README / 公网链接.txt 里的地址打开本页，再复制分享。</p>
+        <label style="margin-top:18px">从 cards.json 文本粘贴导入</label>
+        <textarea id="pasteJson" placeholder='{"title":"我的卡组","cards":[{"front":"问","back":"答","tag":""}]}'></textarea>
+        <div class="row">
+          <button type="button" class="btn btn-outline" onclick="importFromPaste()">从文本导入</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="tiny">T3 知识卡片 · 课程示范 · 数据默认存本机浏览器</footer>
+  </div>
+
+<script>
+/* ========== 【改这里②】内置示范卡组 ========== */
+const BUILTIN = {
+  title: "示范卡组：英语单词",
+  cards: [
+    { front: "apple", back: "苹果", tag: "水果" },
+    { front: "book", back: "书", tag: "学习" },
+    { front: "happy", back: "高兴的", tag: "情绪" },
+    { front: "How are you?", back: "你好吗？", tag: "口语" },
+    { front: "thank you", back: "谢谢", tag: "口语" }
+  ]
+};
+
+const STORAGE_KEY = "t3_knowledge_cards_v1";
+const MARKS_KEY = "t3_knowledge_marks_v1";
+
+let state = {
+  title: BUILTIN.title,
+  cards: [],
+  index: 0,
+  flipped: false
+};
+
+function uid() {
+  return "c_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
+}
+
+function normalizeCards(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map((c) => ({
+    id: c.id || uid(),
+    front: String(c.front || c.q || "").trim(),
+    back: String(c.back || c.a || "").trim(),
+    tag: String(c.tag || "").trim()
+  })).filter((c) => c.front || c.back);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      state.title = data.title || "我的卡组";
+      state.cards = normalizeCards(data.cards || []);
+      return;
+    }
+  } catch (e) {}
+  state.title = BUILTIN.title;
+  state.cards = normalizeCards(BUILTIN.cards);
+  persist();
+}
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    title: state.title,
+    cards: state.cards.map(({ id, front, back, tag }) => ({ id, front, back, tag }))
+  }));
+}
+
+function getMarks() {
+  try { return JSON.parse(localStorage.getItem(MARKS_KEY) || "{}") || {}; }
+  catch (e) { return {}; }
+}
+
+function setMark(id, status) {
+  const m = getMarks();
+  if (!status) delete m[id];
+  else m[id] = status;
+  localStorage.setItem(MARKS_KEY, JSON.stringify(m));
+}
+
+function clearMarks() {
+  localStorage.removeItem(MARKS_KEY);
+  renderList();
+  renderStudy();
+  alert("已清除本机「记住了/再看」标记。");
+}
+
+function isLocalHost() {
+  const h = location.hostname;
+  return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "0.0.0.0" || h === "";
+}
+
+function updateLocalhostWarn() {
+  const box = document.getElementById("localhostWarn");
+  if (box) box.style.display = isLocalHost() ? "block" : "none";
+}
+
+function encodeDeck(deck) {
+  const json = JSON.stringify({
+    title: deck.title || "卡组",
+    cards: (deck.cards || []).map(({ front, back, tag }) => ({ front, back, tag: tag || "" }))
+  });
+  const bytes = new TextEncoder().encode(json);
+  let bin = "";
+  bytes.forEach((b) => { bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodeDeck(hashPart) {
+  let s = hashPart.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  const bin = atob(s);
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  const json = new TextDecoder().decode(bytes);
+  const data = JSON.parse(json);
+  return {
+    title: data.title || "分享卡组",
+    cards: normalizeCards(data.cards || [])
+  };
+}
+
+function getShareBase() {
+  const box = document.getElementById("shareBase");
+  const v = (box && box.value || "").trim();
+  if (v) return v.replace(/\/?$/, "/");
+  if (!isLocalHost()) {
+    return location.origin + location.pathname.replace(/index\.html$/, "");
+  }
+  return "";
+}
+
+function joinBaseAndHash(base, hash) {
+  let url = (base || "").split("#")[0].trim();
+  if (!url) return null;
+  if (!/\.html?$/i.test(url) && !url.endsWith("/")) url += "/";
+  return url + hash;
+}
+
+function copyShareLink() {
+  if (!state.cards.length) {
+    alert("还没有卡片，先加几张再分享。");
+    return;
+  }
+  if (state.cards.length > 30) {
+    if (!confirm("当前有 " + state.cards.length + " 张卡，分享链接会很长，可能被微信等截断。建议 ≤30 张。仍要复制？")) return;
+  }
+  const hash = "#c=" + encodeDeck({ title: state.title, cards: state.cards });
+  let base = getShareBase();
+  if (!base) {
+    if (isLocalHost()) {
+      const tip = prompt(
+        "当前是本机地址，同学打不开。请粘贴公网基址（见 公网链接.txt）：",
+        "https://请填入发布后的公网地址/"
+      );
+      if (!tip) return;
+      base = tip.trim();
+      const box = document.getElementById("shareBase");
+      if (box) box.value = base;
+    } else {
+      base = location.href.split("#")[0];
+    }
+  }
+  const url = joinBaseAndHash(base, hash);
+  if (!url) { alert("缺少分享基址"); return; }
+  navigator.clipboard.writeText(url).then(() => {
+    alert("分享链接已复制！\n同学打开即可学同一套卡。\n（链接含 #c= 卡组数据）");
+  }).catch(() => {
+    prompt("请手动复制：", url);
+  });
+}
+
+function exportJson() {
+  const data = {
+    title: state.title,
+    cards: state.cards.map(({ front, back, tag }) => ({ front, back, tag }))
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.title || "cards").replace(/[\\/:*?"<>|]/g, "_") + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function triggerImport() {
+  document.getElementById("importFile").click();
+}
+
+function applyDeck(deck, notice) {
+  state.title = deck.title || "我的卡组";
+  state.cards = normalizeCards(deck.cards);
+  state.index = 0;
+  state.flipped = false;
+  persist();
+  renderAll();
+  if (notice) alert(notice);
+}
+
+function importFromPaste() {
+  const t = document.getElementById("pasteJson").value.trim();
+  if (!t) { alert("请先粘贴 JSON"); return; }
+  try {
+    const data = JSON.parse(t);
+    applyDeck(data, "已从文本导入 " + normalizeCards(data.cards || []).length + " 张卡片。");
+  } catch (e) {
+    alert("JSON 格式不对：" + e.message);
+  }
+}
+
+function loadBuiltin() {
+  applyDeck(BUILTIN, "已载入示范卡组。");
+}
+
+async function tryLoadCardsJson() {
+  try {
+    const res = await fetch("cards.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    // only auto-load if no localStorage yet — handled in boot
+    return data;
+  } catch (e) {
+    return null;
+  }
+}
+
+function switchTab(name) {
+  document.querySelectorAll("nav.tabs button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+  document.querySelectorAll(".panel").forEach((p) => {
+    p.classList.toggle("active", p.id === "panel-" + name);
+  });
+}
+
+function renderStudy() {
+  const empty = !state.cards.length;
+  document.getElementById("studyEmpty").hidden = !empty;
+  document.getElementById("studyArea").hidden = empty;
+  document.getElementById("studyDeckTitle").textContent = state.title || "卡组";
+  if (empty) {
+    document.getElementById("studyProgress").textContent = "0 / 0";
+    return;
+  }
+  if (state.index < 0) state.index = 0;
+  if (state.index >= state.cards.length) state.index = state.cards.length - 1;
+  const c = state.cards[state.index];
+  document.getElementById("studyProgress").textContent =
+    (state.index + 1) + " / " + state.cards.length +
+    (function () {
+      const m = getMarks()[c.id];
+      if (m === "remembered") return " · 已记住";
+      if (m === "review") return " · 需再看";
+      return "";
+    })();
+  document.getElementById("faceFront").textContent = c.front || "（空正面）";
+  document.getElementById("faceBack").textContent = c.back || "（空背面）";
+  const tagEl = document.getElementById("faceTag");
+  tagEl.innerHTML = c.tag ? '<span class="tag">' + escapeHtml(c.tag) + "</span>" : "";
+  const flip = document.getElementById("flipCard");
+  flip.classList.toggle("flipped", !!state.flipped);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function renderList() {
+  document.getElementById("deckTitleInput").value = state.title || "";
+  const ul = document.getElementById("cardList");
+  const empty = document.getElementById("listEmpty");
+  ul.innerHTML = "";
+  if (!state.cards.length) {
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  const marks = getMarks();
+  state.cards.forEach((c, i) => {
+    const li = document.createElement("li");
+    const mark = marks[c.id];
+    let badge = "";
+    if (mark === "remembered") badge = '<span class="badge badge-ok">记住了</span>';
+    else if (mark === "review") badge = '<span class="badge badge-review">再看</span>';
+    li.innerHTML =
+      '<div class="meta">' +
+      (c.tag ? '<span class="tag">' + escapeHtml(c.tag) + "</span>" : "") +
+      badge +
+      '<div class="front">' + escapeHtml(c.front || "（空）") + "</div>" +
+      '<div class="back-preview">' + escapeHtml(c.back || "") + "</div></div>" +
+      '<div class="row" style="margin:0;flex-direction:column;gap:6px">' +
+      '<button type="button" class="btn btn-outline btn-sm" data-act="study" data-i="' + i + '">学习</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-act="edit" data-i="' + i + '">编辑</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-act="del" data-i="' + i + '">删除</button>' +
+      "</div>";
+    ul.appendChild(li);
+  });
+  ul.onclick = (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if (!btn) return;
+    const i = +btn.dataset.i;
+    const act = btn.dataset.act;
+    if (act === "study") {
+      state.index = i;
+      state.flipped = false;
+      switchTab("study");
+      renderStudy();
+    } else if (act === "edit") {
+      const c = state.cards[i];
+      document.getElementById("editId").value = c.id;
+      document.getElementById("editFront").value = c.front;
+      document.getElementById("editBack").value = c.back;
+      document.getElementById("editTag").value = c.tag || "";
+      switchTab("edit");
+    } else if (act === "del") {
+      if (!confirm("删除这张卡片？")) return;
+      state.cards.splice(i, 1);
+      if (state.index >= state.cards.length) state.index = Math.max(0, state.cards.length - 1);
+      persist();
+      renderAll();
+    }
+  };
+}
+
+function renderAll() {
+  renderStudy();
+  renderList();
+  updateLocalhostWarn();
+}
+
+function toggleFlip() {
+  if (!state.cards.length) return;
+  state.flipped = !state.flipped;
+  document.getElementById("flipCard").classList.toggle("flipped", state.flipped);
+}
+
+function prevCard() {
+  if (!state.cards.length) return;
+  state.index = (state.index - 1 + state.cards.length) % state.cards.length;
+  state.flipped = false;
+  renderStudy();
+}
+
+function nextCard() {
+  if (!state.cards.length) return;
+  state.index = (state.index + 1) % state.cards.length;
+  state.flipped = false;
+  renderStudy();
+}
+
+function markStatus(status) {
+  if (!state.cards.length) return;
+  const c = state.cards[state.index];
+  setMark(c.id, status);
+  renderStudy();
+  renderList();
+  // auto next after mark
+  setTimeout(() => { nextCard(); }, 180);
+}
+
+function saveDeckTitle() {
+  state.title = document.getElementById("deckTitleInput").value.trim() || "我的卡组";
+  persist();
+  renderAll();
+  alert("卡组名称已保存。");
+}
+
+function saveCard() {
+  const front = document.getElementById("editFront").value.trim();
+  const back = document.getElementById("editBack").value.trim();
+  const tag = document.getElementById("editTag").value.trim();
+  const id = document.getElementById("editId").value;
+  if (!front && !back) {
+    alert("正面或背面至少填一项。");
+    return;
+  }
+  if (id) {
+    const i = state.cards.findIndex((c) => c.id === id);
+    if (i >= 0) {
+      state.cards[i] = { id, front, back, tag };
+    } else {
+      state.cards.push({ id: uid(), front, back, tag });
+    }
+  } else {
+    state.cards.push({ id: uid(), front, back, tag });
+  }
+  persist();
+  resetEditForm();
+  renderAll();
+  alert("卡片已保存。可去「学习」或继续添加。");
+}
+
+function resetEditForm() {
+  document.getElementById("editId").value = "";
+  document.getElementById("editFront").value = "";
+  document.getElementById("editBack").value = "";
+  document.getElementById("editTag").value = "";
+}
+
+function tryParseHash() {
+  const h = location.hash || "";
+  if (h.startsWith("#c=")) {
+    try {
+      const deck = decodeDeck(h.slice(3));
+      if (deck.cards.length) {
+        applyDeck(deck, null);
+        return true;
+      }
+    } catch (e) {
+      console.warn("hash decode failed", e);
+      alert("分享链接里的卡组解析失败，请检查链接是否被截断。");
+    }
+  }
+  return false;
+}
+
+document.getElementById("tabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-tab]");
+  if (!b) return;
+  switchTab(b.dataset.tab);
+});
+
+document.getElementById("importFile").addEventListener("change", (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      applyDeck(data, "已导入 " + normalizeCards(data.cards || []).length + " 张卡片。");
+    } catch (err) {
+      alert("导入失败：" + err.message);
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = "";
+});
+
+document.addEventListener("keydown", (e) => {
+  const tag = (e.target && e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea") return;
+  const studyOn = document.getElementById("panel-study").classList.contains("active");
+  if (!studyOn) return;
+  if (e.key === "ArrowLeft") { e.preventDefault(); prevCard(); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); nextCard(); }
+  else if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggleFlip(); }
+});
+
+document.getElementById("flipCard").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleFlip(); }
+});
+
+(async function boot() {
+  updateLocalhostWarn();
+  const fromHash = tryParseHash();
+  if (!fromHash) {
+    const hasLocal = !!localStorage.getItem(STORAGE_KEY);
+    if (!hasLocal) {
+      const fileDeck = await tryLoadCardsJson();
+      if (fileDeck && (fileDeck.cards || []).length) {
+        state.title = fileDeck.title || BUILTIN.title;
+        state.cards = normalizeCards(fileDeck.cards);
+        persist();
+      } else {
+        loadState();
+      }
+    } else {
+      loadState();
+    }
+  }
+  renderAll();
+  // remember share base from session if any
+  try {
+    const sb = sessionStorage.getItem("t3_share_base");
+    if (sb) document.getElementById("shareBase").value = sb;
+  } catch (e) {}
+  document.getElementById("shareBase").addEventListener("change", () => {
+    try { sessionStorage.setItem("t3_share_base", document.getElementById("shareBase").value.trim()); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
