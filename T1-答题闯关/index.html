@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>口算/知识点答题闯关</title>
+  <style>
+    /* ========== 【改这里①】主题色：改下面几个颜色就能换皮肤 ========== */
+    :root {
+      --primary: #4f6ef7;
+      --primary-dark: #3a55d4;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg: #f0f4ff;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(79, 110, 247, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+      background: linear-gradient(160deg, var(--bg) 0%, #e8eeff 50%, #fdf4ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      font-size: 18px; /* 大字友好 */
+    }
+    .app { max-width: 560px; margin: 0 auto; padding: 16px 16px 48px; }
+    h1 { font-size: 1.6rem; text-align: center; margin: 12px 0 4px; }
+    .subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 20px; }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .card h2 { font-size: 1.25rem; margin-bottom: 12px; }
+    .card h3 { font-size: 1.05rem; margin: 16px 0 8px; color: var(--primary-dark); }
+    .tabs {
+      display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .tab {
+      flex: 1; min-width: 90px;
+      padding: 12px 8px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: 0.15s;
+    }
+    .tab.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.15s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-outline {
+      background: #fff;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-sm { width: auto; padding: 8px 16px; font-size: 0.95rem; margin: 4px 4px 4px 0; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .btn-row .btn { width: auto; flex: 1; min-width: 120px; }
+    label { display: block; font-weight: 600; margin: 10px 0 6px; font-size: 0.95rem; }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-family: inherit;
+    }
+    textarea { min-height: 140px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--primary);
+    }
+    .hint { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+    .template-grid { display: grid; gap: 10px; }
+    .template-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+      background: #fafbff;
+    }
+    .template-card:hover, .template-card.selected {
+      border-color: var(--primary);
+      background: #eef2ff;
+    }
+    .template-card strong { font-size: 1.1rem; display: block; }
+    .template-card span { color: var(--muted); font-size: 0.9rem; }
+    .hidden { display: none !important; }
+    /* 闯关答题 */
+    .quiz-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+    }
+    .badge {
+      background: #eef2ff; color: var(--primary-dark);
+      padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+    }
+    .progress-bar {
+      height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-bottom: 16px;
+    }
+    .progress-fill {
+      height: 100%; background: var(--primary); width: 0%; transition: width 0.3s;
+    }
+    .question-text {
+      font-size: 1.6rem; font-weight: 700; text-align: center;
+      margin: 20px 0 24px; word-break: break-word;
+    }
+    .options { display: grid; gap: 12px; }
+    .option-btn {
+      padding: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+      font-size: 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: 0.15s;
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #eef2ff; }
+    .option-btn.correct { border-color: var(--success); background: #dcfce7; color: #166534; }
+    .option-btn.wrong { border-color: var(--danger); background: #fee2e2; color: #991b1b; }
+    .option-btn:disabled { cursor: default; opacity: 0.95; }
+    .fill-row { display: flex; gap: 8px; align-items: center; }
+    .fill-row input { flex: 1; font-size: 1.3rem; text-align: center; }
+    .feedback {
+      text-align: center; font-size: 1.2rem; font-weight: 700;
+      margin: 16px 0; min-height: 1.5em;
+    }
+    .feedback.ok { color: var(--success); }
+    .feedback.bad { color: var(--danger); }
+    /* 结果页 */
+    .result-score {
+      font-size: 3rem; font-weight: 800; text-align: center;
+      color: var(--primary); margin: 12px 0;
+    }
+    .result-stars { text-align: center; font-size: 2rem; margin-bottom: 8px; }
+    .confetti {
+      text-align: center; font-size: 2.5rem; animation: bounce 0.6s ease;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    /* 排行榜 / 错题 */
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    th, td { padding: 10px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { color: var(--muted); font-weight: 600; }
+    .wrong-item {
+      border-left: 4px solid var(--danger);
+      padding: 12px; margin-bottom: 10px;
+      background: #fff5f5; border-radius: 0 10px 10px 0;
+    }
+    .wrong-item .ans { color: var(--success); font-weight: 700; margin-top: 4px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: #fff; padding: 12px 20px;
+      border-radius: 999px; font-weight: 600; z-index: 99;
+      opacity: 0; pointer-events: none; transition: 0.3s;
+    }
+    .toast.show { opacity: 1; }
+    .home-actions .btn { margin-top: 8px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 400px) {
+      .row-2 { grid-template-columns: 1fr; }
+      .question-text { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>🎯 答题闯关</h1>
+    <p class="subtitle">口算 · 知识点 · 同学比分</p>
+
+    <!-- ===== 首页 ===== -->
+    <div id="view-home">
+      <div class="card home-actions">
+        <h2>选一个开始</h2>
+        <p class="hint" id="home-share-tip">同学打开「分享链接」即可玩同一套题；排行榜在云端站点<strong>认领后</strong>可跨手机同步（未认领时先存本机）。</p>
+        <button class="btn btn-primary" onclick="showView('parent')">👨‍👩‍👧 家长出题</button>
+        <button class="btn btn-success" id="btn-start-play" onclick="startPlayFromCurrent()" disabled>
+          🚀 开始闯关
+        </button>
+        <p class="hint" id="home-quiz-hint">请先出题，或打开分享链接自动载入题库。</p>
+        <button class="btn btn-outline" onclick="showView('board')">🏆 排行榜 / 错题回顾</button>
+      </div>
+      <div class="card" id="loaded-quiz-info" style="display:none">
+        <h2>当前题库</h2>
+        <p id="loaded-quiz-meta"></p>
+        <div class="btn-row">
+          <button class="btn btn-outline btn-sm" onclick="copyShareLink()">📋 复制分享链接</button>
+          <div class="hint" style="margin-top:8px;font-size:14px;line-height:1.5">
+            分享基址（可选）：<input id="shareBase" type="url" placeholder="https://你的公网地址/" style="width:min(100%,280px);font-size:14px;padding:6px 8px" />
+            <div style="opacity:.8;margin-top:4px">若当前是 127.0.0.1，请填公网地址再复制，否则同学打不开。</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="clearCurrentQuiz()">清空题库</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 家长出题 ===== -->
+    <div id="view-parent" class="hidden">
+      <div class="tabs">
+        <button class="tab active" data-ptab="template" onclick="switchParentTab('template')">口算模板</button>
+        <button class="tab" data-ptab="custom" onclick="switchParentTab('custom')">自定义题目</button>
+        <button class="tab" data-ptab="json" onclick="switchParentTab('json')">JSON题库</button>
+      </div>
+
+      <div class="card" id="ptab-template">
+        <h2>一键生成口算</h2>
+        <div class="template-grid" id="template-list"></div>
+        <div class="row-2">
+          <div>
+            <label>题数</label>
+            <input type="number" id="tpl-count" value="5" min="3" max="50" />
+          </div>
+          <div>
+            <label>套卷名称（可选）</label>
+            <input type="text" id="tpl-title" placeholder="如：周末口算" />
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateFromTemplate()">✨ 生成并载入</button>
+        <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
+      </div>
+
+      <div class="card hidden" id="ptab-custom">
+        <h2>粘贴自定义题目</h2>
+        <p class="hint">
+          每行一题。<br />
+          选择题：<code>题干|正确答案|错误1|错误2|错误3</code><br />
+          填空题：<code>题干|答案</code>
+        </p>
+        <label>套卷名称</label>
+        <input type="text" id="custom-title" placeholder="如：科学小知识" value="自定义闯关" />
+        <label>题目内容</label>
+        <textarea id="custom-text" placeholder="一周有几天？|7|5|6|8&#10;中国的首都是？|北京|上海|广州|深圳&#10;3+5=?|8"></textarea>
+        <button class="btn btn-primary" onclick="generateFromCustom()">✨ 生成并载入</button>
+        <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
+      </div>
+
+      <div class="card hidden" id="ptab-json">
+        <h2>从 questions.json 载入</h2>
+        <p class="hint">改同目录的 <code>questions.json</code> 后，点下面按钮刷新（需用本地服务器打开）。</p>
+        <button class="btn btn-primary" onclick="loadFromJsonBank()">📦 载入 JSON 示例题库</button>
+        <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
+        <pre id="json-preview" class="hint" style="margin-top:12px;white-space:pre-wrap;max-height:160px;overflow:auto;background:#f8fafc;padding:10px;border-radius:8px;"></pre>
+      </div>
+    </div>
+
+    <!-- ===== 闯关前：填昵称 ===== -->
+    <div id="view-ready" class="hidden">
+      <div class="card">
+        <h2>准备闯关</h2>
+        <p id="ready-meta" class="hint"></p>
+        <label>你的昵称（上榜用）</label>
+        <input type="text" id="player-name" placeholder="如：小明" maxlength="12" />
+        <button class="btn btn-success" onclick="beginQuiz()">开始！</button>
+        <button class="btn btn-outline" onclick="showView('home')">返回</button>
+      </div>
+    </div>
+
+    <!-- ===== 答题中 ===== -->
+    <div id="view-quiz" class="hidden">
+      <div class="card">
+        <div class="quiz-header">
+          <span class="badge" id="quiz-progress">第 1 / 10 题</span>
+          <span class="badge" id="quiz-timer">⏱ 0秒</span>
+          <span class="badge" id="quiz-score">得分 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="quiz-bar"></div></div>
+        <div class="question-text" id="quiz-q"></div>
+        <div id="quiz-options" class="options"></div>
+        <div id="quiz-fill" class="hidden">
+          <div class="fill-row">
+            <input type="text" id="fill-answer" placeholder="输入答案" autocomplete="off" />
+            <button class="btn btn-primary btn-sm" style="width:auto;margin:0" onclick="submitFill()">提交</button>
+          </div>
+        </div>
+        <div class="feedback" id="quiz-feedback"></div>
+        <button class="btn btn-primary hidden" id="btn-next" onclick="nextQuestion()">下一题 →</button>
+      </div>
+    </div>
+
+    <!-- ===== 结果 ===== -->
+    <div id="view-result" class="hidden">
+      <div class="card">
+        <div class="confetti" id="result-emoji">🎉</div>
+        <h2 style="text-align:center">闯关结束！</h2>
+        <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+        <div class="result-score" id="result-score">0</div>
+        <p style="text-align:center;color:var(--muted)" id="result-detail"></p>
+        <button class="btn btn-success" onclick="showView('board')">查看排行榜 / 错题</button>
+        <button class="btn btn-primary" onclick="startPlayFromCurrent()">再玩一次</button>
+        <button class="btn btn-outline" onclick="copyShareLink()">📋 复制分享链接给同学</button>
+        <button class="btn btn-outline" onclick="showView('home')">回首页</button>
+      </div>
+    </div>
+
+    <!-- ===== 排行榜 + 错题 ===== -->
+    <div id="view-board" class="hidden">
+      <div class="card">
+        <h2>🏆 排行榜</h2>
+        <p class="hint" id="board-source-hint">优先显示云端榜；失败时显示本机榜。</p>
+        <p id="board-quiz-name" class="hint"></p>
+        <p id="board-cloud-status" class="hint"></p>
+        <div id="board-table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>昵称</th><th>分数</th><th>用时</th><th>时间</th></tr></thead>
+            <tbody id="board-body"></tbody>
+          </table>
+          <p id="board-empty" class="hint hidden">还没有成绩，先去闯关吧！</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="clearLeaderboard()">清空本机本套题排行</button>
+      </div>
+      <div class="card">
+        <h2>📝 本局错题回顾</h2>
+        <div id="wrong-list"><p class="hint">完成本局闯关后这里会显示错题。</p></div>
+      </div>
+      <button class="btn btn-outline" onclick="showView('home')">回首页</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  /* ============================================================
+   *  【改这里②】内置口算模板与默认题库
+   *  不想碰 questions.json 时，直接改下面 CONFIG 即可。
+   * ============================================================ */
+  const CONFIG = {
+    // 【改这里③】计分规则：答对加多少分、答错是否扣分
+    scoreCorrect: 10,
+    scoreWrong: 0,
+    // 口算模板（与 questions.json 同步，离线也能用）
+    templates: [
+      { id: "add10", name: "10以内加法", desc: "适合一年级，两数相加不超过10", op: "add", max: 10, count: 5 },
+      { id: "addsub20", name: "20以内加减", desc: "加法和减法混合，结果在0～20", op: "addsub", max: 20, count: 5 },
+      { id: "mul99", name: "九九乘法", desc: "乘法口诀表练习", op: "mul", max: 9, count: 5 }
+    ],
+    // 自定义示例（也可被 questions.json 覆盖）
+    customBank: [
+      { q: "一周有几天？", a: "7", options: ["5", "6", "7", "8"] },
+      { q: "中国的首都是？", a: "北京", options: ["上海", "北京", "广州", "深圳"] },
+      { q: "1小时等于多少分钟？", a: "60", options: ["30", "60", "100", "24"] }
+    ]
+  };
+
+  // ---------- 状态 ----------
+  let currentQuiz = null;   // { id, title, questions: [{q,a,options?}] }
+  let selectedTemplateId = "add10";
+  let playState = null;     // 本局进行中状态
+  let lastWrong = [];       // 本局错题
+
+  // ---------- 工具 ----------
+  function toast(msg) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 2200);
+  }
+  function showView(name) {
+    ["home", "parent", "ready", "quiz", "result", "board"].forEach(v => {
+      document.getElementById("view-" + v).classList.toggle("hidden", v !== name);
+    });
+    if (name === "board") renderBoard();
+    if (name === "home") refreshHome();
+  }
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function uid() {
+    return "q_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
+  }
+  function encodeQuiz(quiz) {
+    // 精简字段写入 URL
+    const payload = { id: quiz.id, title: quiz.title, questions: quiz.questions };
+    const json = JSON.stringify(payload);
+    // base64url（兼容中文）
+    const b64 = btoa(unescape(encodeURIComponent(json)))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return b64;
+  }
+  function decodeQuiz(b64) {
+    try {
+      let s = b64.replace(/-/g, "+").replace(/_/g, "/");
+      while (s.length % 4) s += "=";
+      const json = decodeURIComponent(escape(atob(s)));
+      return JSON.parse(json);
+    } catch (e) {
+      console.warn("解码题库失败", e);
+      return null;
+    }
+  }
+  function setHashQuiz(quiz) {
+    const hash = "#q=" + encodeQuiz(quiz);
+    // 用 replace 避免堆很多历史记录
+    history.replaceState(null, "", location.pathname + location.search + hash);
+  }
+  function loadQuizFromHash() {
+    const m = location.hash.match(/[#&]q=([^&]+)/);
+    if (!m) return null;
+    return decodeQuiz(m[1]);
+  }
+
+  // ---------- 口算生成 ----------
+  function genOralQuestions(op, max, count) {
+    const qs = [];
+    const seen = new Set();
+    let guard = 0;
+    while (qs.length < count && guard < count * 20) {
+      guard++;
+      let a, b, ans, text, realOp = op;
+      if (op === "addsub") realOp = Math.random() < 0.5 ? "add" : "sub";
+      if (realOp === "add") {
+        a = randInt(0, max);
+        b = randInt(0, max - a);
+        ans = a + b;
+        text = a + " + " + b + " = ?";
+      } else if (realOp === "sub") {
+        a = randInt(0, max);
+        b = randInt(0, a);
+        ans = a - b;
+        text = a + " − " + b + " = ?";
+      } else if (realOp === "mul") {
+        a = randInt(1, max);
+        b = randInt(1, max);
+        ans = a * b;
+        text = a + " × " + b + " = ?";
+      } else {
+        continue;
+      }
+      const key = text;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const options = makeOptions(ans, realOp === "mul" ? max * max : max);
+      qs.push({ q: text, a: String(ans), options: options.map(String) });
+    }
+    return qs;
+  }
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  function makeOptions(correct, maxVal) {
+    const set = new Set([correct]);
+    let tries = 0;
+    while (set.size < 4 && tries < 40) {
+      tries++;
+      const delta = randInt(-5, 5) || 1;
+      let v = correct + delta;
+      if (v < 0) v = Math.abs(v);
+      if (v === correct) continue;
+      set.add(v);
+    }
+    while (set.size < 4) set.add(randInt(0, Math.max(maxVal, 10)));
+    return shuffle([...set]);
+  }
+
+  // ---------- 解析自定义文本 ----------
+  function parseCustomText(text) {
+    const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+    const questions = [];
+    for (const line of lines) {
+      const parts = line.split("|").map(p => p.trim());
+      if (parts.length < 2) continue;
+      const q = parts[0];
+      const a = parts[1];
+      if (parts.length === 2) {
+        // 填空
+        questions.push({ q, a, options: null });
+      } else {
+        // 选择：正确答案 + 干扰项
+        const distractors = parts.slice(2);
+        const options = shuffle([a, ...distractors]).slice(0, 6);
+        if (!options.includes(a)) options[0] = a;
+        questions.push({ q, a, options: shuffle(options) });
+      }
+    }
+    return questions;
+  }
+
+  // ---------- 载入 / 保存当前题库 ----------
+  function setCurrentQuiz(quiz) {
+    if (!quiz || !quiz.questions || !quiz.questions.length) {
+      toast("题目为空，请重新生成");
+      return;
+    }
+    if (!quiz.id) quiz.id = uid();
+    if (!quiz.title) quiz.title = "答题闯关";
+    currentQuiz = quiz;
+    setHashQuiz(quiz);
+    try {
+      localStorage.setItem("t1_last_quiz", JSON.stringify(quiz));
+    } catch (_) {}
+    refreshHome();
+    toast("题库已载入：" + quiz.questions.length + " 题");
+  }
+  function refreshHome() {
+    const btn = document.getElementById("btn-start-play");
+    const hint = document.getElementById("home-quiz-hint");
+    const info = document.getElementById("loaded-quiz-info");
+    const meta = document.getElementById("loaded-quiz-meta");
+    if (currentQuiz) {
+      btn.disabled = false;
+      hint.textContent = "题库就绪，可以开始闯关啦！";
+      info.style.display = "block";
+      meta.textContent = "「" + currentQuiz.title + "」共 " + currentQuiz.questions.length + " 题";
+    } else {
+      btn.disabled = true;
+      hint.textContent = "请先出题，或打开分享链接自动载入题库。";
+      info.style.display = "none";
+    }
+  }
+  function clearCurrentQuiz() {
+    currentQuiz = null;
+    history.replaceState(null, "", location.pathname + location.search);
+    localStorage.removeItem("t1_last_quiz");
+    refreshHome();
+    toast("已清空题库");
+  }
+  function isLocalHost() {
+    const h = location.hostname;
+    return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "0.0.0.0";
+  }
+  function buildShareUrl() {
+    // 公网域名下自动是公网链接；禁止默认拼出 127.0.0.1 给同学
+    const hash = "#q=" + encodeQuiz(currentQuiz);
+    return location.origin + location.pathname + hash;
+  }
+  
+  function getShareOrigin() {
+    const box = document.getElementById("shareBase");
+    let base = (box && box.value.trim()) || "";
+    if (base && !/^https?:\/\//i.test(base)) base = "https://" + base;
+    if (base) return base.replace(/\/?$/, "/");
+    const h = location.hostname;
+    if (h === "localhost" || h === "127.0.0.1") {
+      return ""; // signal invalid for external share
+    }
+    return location.origin + location.pathname.replace(/[^/]*$/, "");
+  }
+
+function copyShareLink() {
+    if (!currentQuiz) { toast("请先出题或载入题库"); return; }
+    const hash = "#q=" + encodeQuiz(currentQuiz);
+    if (hash.length > 2000) toast("链接偏长，建议≤15题再分享（微信等可能截断）");
+    let base = getShareOrigin();
+    if (!base) {
+      const tip = prompt("当前是本机地址，同学打不开。请粘贴公网基址：", "https://lively-mirage-sh6f.here.now/");
+      if (!tip) { toast("已取消复制"); return; }
+      base = tip.trim().replace(/\/?$/, "/");
+      const box = document.getElementById("shareBase");
+      if (box) box.value = base;
+    }
+    const url = base.replace(/\/?$/, "/") + hash;
+    navigator.clipboard.writeText(url).then(() => toast("已复制分享链接")).catch(() => prompt("请手动复制：", url));
+  }
+
+  // ---------- 家长：模板 ----------
+  function renderTemplates() {
+    const box = document.getElementById("template-list");
+    box.innerHTML = "";
+    CONFIG.templates.forEach(t => {
+      const div = document.createElement("div");
+      div.className = "template-card" + (t.id === selectedTemplateId ? " selected" : "");
+      div.innerHTML = "<strong>" + t.name + "</strong><span>" + t.desc + "</span>";
+      div.onclick = () => {
+        selectedTemplateId = t.id;
+        document.getElementById("tpl-count").value = t.count;
+        renderTemplates();
+      };
+      box.appendChild(div);
+    });
+  }
+  function generateFromTemplate() {
+    const t = CONFIG.templates.find(x => x.id === selectedTemplateId);
+    if (!t) return;
+    const count = Math.min(50, Math.max(3, parseInt(document.getElementById("tpl-count").value, 10) || t.count));
+    const title = (document.getElementById("tpl-title").value || t.name).trim();
+    const questions = genOralQuestions(t.op, t.max, count);
+    setCurrentQuiz({ id: uid(), title, questions, templateId: t.id });
+    showView("home");
+  }
+  function generateFromCustom() {
+    const title = (document.getElementById("custom-title").value || "自定义闯关").trim();
+    const text = document.getElementById("custom-text").value;
+    const questions = parseCustomText(text);
+    if (!questions.length) {
+      toast("没解析到题目，请检查格式");
+      return;
+    }
+    setCurrentQuiz({ id: uid(), title, questions });
+    showView("home");
+  }
+  function switchParentTab(name) {
+    document.querySelectorAll("[data-ptab]").forEach(el => {
+      el.classList.toggle("active", el.getAttribute("data-ptab") === name);
+    });
+    ["template", "custom", "json"].forEach(n => {
+      document.getElementById("ptab-" + n).classList.toggle("hidden", n !== name);
+    });
+  }
+  async function loadFromJsonBank() {
+    try {
+      const res = await fetch("questions.json?_=" + Date.now());
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (data.templates) {
+        // 合并模板配置（可选）
+        const arr = Object.values(data.templates).map(t => ({
+          id: t.id, name: t.name, desc: t.desc, op: t.op, max: t.max, count: t.count
+        }));
+        if (arr.length) CONFIG.templates = arr;
+        renderTemplates();
+      }
+      if (data.customBank && data.customBank.length) {
+        CONFIG.customBank = data.customBank;
+        const questions = data.customBank.map(item => ({
+          q: item.q,
+          a: String(item.a),
+          options: item.options ? item.options.map(String) : null
+        }));
+        setCurrentQuiz({ id: uid(), title: "JSON示例题库", questions });
+        document.getElementById("json-preview").textContent = JSON.stringify(data.customBank, null, 2);
+        showView("home");
+      } else {
+        toast("JSON 里没有 customBank");
+      }
+    } catch (e) {
+      toast("读取失败：请用本地服务器打开（不能用 file://）");
+      document.getElementById("json-preview").textContent = "错误：" + e.message +
+        "\n提示：在本目录运行 python3 -m http.server 8080 再访问。";
+    }
+  }
+
+  // ---------- 闯关 ----------
+  function startPlayFromCurrent() {
+    if (!currentQuiz) { toast("请先出题"); return; }
+    document.getElementById("ready-meta").textContent =
+      "「" + currentQuiz.title + "」共 " + currentQuiz.questions.length + " 题";
+    const savedName = localStorage.getItem("t1_player_name") || "";
+    document.getElementById("player-name").value = savedName;
+    showView("ready");
+  }
+  function beginQuiz() {
+    const name = (document.getElementById("player-name").value || "匿名选手").trim().slice(0, 12);
+    localStorage.setItem("t1_player_name", name);
+    playState = {
+      name,
+      index: 0,
+      score: 0,
+      correct: 0,
+      wrong: [],
+      startTime: Date.now(),
+      timerId: null,
+      answered: false,
+      questions: shuffle(currentQuiz.questions.map(q => ({ ...q })))
+    };
+    lastWrong = [];
+    playState.timerId = setInterval(updateTimer, 500);
+    showView("quiz");
+    renderQuestion();
+  }
+  function updateTimer() {
+    if (!playState) return;
+    const sec = Math.floor((Date.now() - playState.startTime) / 1000);
+    document.getElementById("quiz-timer").textContent = "⏱ " + sec + "秒";
+  }
+  function renderQuestion() {
+    const st = playState;
+    const total = st.questions.length;
+    const i = st.index;
+    const item = st.questions[i];
+    st.answered = false;
+    document.getElementById("quiz-progress").textContent = "第 " + (i + 1) + " / " + total + " 题";
+    document.getElementById("quiz-score").textContent = "得分 " + st.score;
+    document.getElementById("quiz-bar").style.width = (((i + 1) / total) * 100) + "%";
+    document.getElementById("quiz-q").textContent = item.q;
+    document.getElementById("quiz-feedback").textContent = "";
+    document.getElementById("quiz-feedback").className = "feedback";
+    document.getElementById("btn-next").classList.add("hidden");
+
+    const optBox = document.getElementById("quiz-options");
+    const fillBox = document.getElementById("quiz-fill");
+    optBox.innerHTML = "";
+    if (item.options && item.options.length) {
+      optBox.classList.remove("hidden");
+      fillBox.classList.add("hidden");
+      item.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.onclick = () => answerChoice(opt, btn);
+        optBox.appendChild(btn);
+      });
+    } else {
+      optBox.classList.add("hidden");
+      fillBox.classList.remove("hidden");
+      const inp = document.getElementById("fill-answer");
+      inp.value = "";
+      inp.focus();
+      inp.onkeydown = (e) => { if (e.key === "Enter") submitFill(); };
+    }
+  }
+  function answerChoice(opt, btn) {
+    if (playState.answered) return;
+    playState.answered = true;
+    const item = playState.questions[playState.index];
+    const ok = String(opt).trim() === String(item.a).trim();
+    applyAnswer(ok, item);
+    document.querySelectorAll(".option-btn").forEach(b => {
+      b.disabled = true;
+      if (String(b.textContent).trim() === String(item.a).trim()) b.classList.add("correct");
+    });
+    if (!ok) btn.classList.add("wrong");
+  }
+  function submitFill() {
+    if (playState.answered) return;
+    const val = document.getElementById("fill-answer").value.trim();
+    if (!val) { toast("请输入答案"); return; }
+    playState.answered = true;
+    const item = playState.questions[playState.index];
+    const ok = val === String(item.a).trim();
+    applyAnswer(ok, item);
+  }
+  function applyAnswer(ok, item) {
+    const fb = document.getElementById("quiz-feedback");
+    if (ok) {
+      playState.score += CONFIG.scoreCorrect;
+      playState.correct++;
+      fb.textContent = "✅ 答对了！+" + CONFIG.scoreCorrect;
+      fb.className = "feedback ok";
+    } else {
+      playState.score += CONFIG.scoreWrong;
+      playState.wrong.push({ q: item.q, a: item.a, your: (typeof given !== "undefined" ? given : null) });
+      fb.textContent = "❌ 答错了，正确答案：" + item.a;
+      fb.className = "feedback bad";
+    }
+    document.getElementById("quiz-score").textContent = "得分 " + playState.score;
+    document.getElementById("btn-next").classList.remove("hidden");
+    // 最后一题按钮文案
+    if (playState.index >= playState.questions.length - 1) {
+      document.getElementById("btn-next").textContent = "查看成绩 →";
+    } else {
+      document.getElementById("btn-next").textContent = "下一题 →";
+    }
+  }
+  function nextQuestion() {
+    if (!playState.answered) return;
+    if (playState.index >= playState.questions.length - 1) {
+      finishQuiz();
+      return;
+    }
+    playState.index++;
+    renderQuestion();
+  }
+  function finishQuiz() {
+    clearInterval(playState.timerId);
+    const elapsed = Math.floor((Date.now() - playState.startTime) / 1000);
+    lastWrong = playState.wrong.slice();
+    const total = playState.questions.length;
+    const rate = playState.correct / total;
+    let stars = "⭐";
+    let emoji = "💪";
+    if (rate >= 0.9) { stars = "⭐⭐⭐"; emoji = "🎉"; }
+    else if (rate >= 0.6) { stars = "⭐⭐"; emoji = "👍"; }
+
+    // 写入排行榜
+    saveScore({
+      quizId: currentQuiz.id,
+      quizTitle: currentQuiz.title,
+      name: playState.name,
+      score: playState.score,
+      correct: playState.correct,
+      total,
+      elapsed,
+      time: Date.now()
+    });
+
+    document.getElementById("result-emoji").textContent = emoji;
+    document.getElementById("result-stars").textContent = stars;
+    document.getElementById("result-score").textContent = playState.score + " 分";
+    document.getElementById("result-detail").textContent =
+      playState.name + " · 答对 " + playState.correct + "/" + total +
+      " · 用时 " + elapsed + " 秒";
+    document.getElementById("quiz-bar").style.width = "100%";
+    showView("result");
+  }
+
+  // ---------- 排行榜：localStorage 兜底 + here.now Site Data 云端 ----------
+  const CLOUD_SCORES_URL = "/.herenow/data/scores";
+
+  function boardKey(quizId) {
+    return "t1_board_" + (quizId || "default");
+  }
+  function getBoard(quizId) {
+    try {
+      return JSON.parse(localStorage.getItem(boardKey(quizId)) || "[]");
+    } catch (_) { return []; }
+  }
+  function sortBoardList(list) {
+    return list.slice().sort((a, b) => {
+      const sa = Number(a.score) || 0, sb = Number(b.score) || 0;
+      if (sb !== sa) return sb - sa;
+      const ea = Number(a.elapsed != null ? a.elapsed : a.seconds) || 0;
+      const eb = Number(b.elapsed != null ? b.elapsed : b.seconds) || 0;
+      return ea - eb;
+    });
+  }
+  function recordFields(record) {
+    return {
+      quiz_id: String(record.quizId || record.quiz_id || "").slice(0, 80),
+      name: String(record.name || "匿名").slice(0, 40),
+      score: Math.max(0, Math.min(100000, parseInt(record.score, 10) || 0)),
+      seconds: Math.max(0, Math.min(86400, parseInt(record.elapsed != null ? record.elapsed : record.seconds, 10) || 0)),
+      correct: Math.max(0, Math.min(1000, parseInt(record.correct, 10) || 0)),
+      total: Math.max(0, Math.min(1000, parseInt(record.total, 10) || 0))
+    };
+  }
+  function normalizeCloudRecord(rec) {
+    // 字段可能平铺，也可能在 data 里
+    const d = (rec && rec.data && typeof rec.data === "object") ? { ...rec, ...rec.data } : (rec || {});
+    return {
+      quizId: d.quiz_id || d.quizId || "",
+      name: d.name || "匿名",
+      score: Number(d.score) || 0,
+      elapsed: Number(d.seconds != null ? d.seconds : d.elapsed) || 0,
+      correct: Number(d.correct) || 0,
+      total: Number(d.total) || 0,
+      time: rec.created_at ? Date.parse(rec.created_at) : (Number(d.time) || Date.now())
+    };
+  }
+  function saveScoreLocal(record) {
+    const list = getBoard(record.quizId);
+    list.push(record);
+    const top = sortBoardList(list).slice(0, 50);
+    localStorage.setItem(boardKey(record.quizId), JSON.stringify(top));
+  }
+  async function postCloudScore(record) {
+    const fields = recordFields(record);
+    const headers = { "Content-Type": "application/json" };
+    try {
+      headers["Idempotency-Key"] = (crypto.randomUUID && crypto.randomUUID()) ||
+        ("t1_" + Date.now() + "_" + Math.random().toString(36).slice(2));
+    } catch (_) {}
+    // 先试扁平字段；400 再试 { data: fields }
+    let res = await fetch(CLOUD_SCORES_URL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(fields)
+    });
+    if (res.status === 400) {
+      res = await fetch(CLOUD_SCORES_URL, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ data: fields })
+      });
+    }
+    if (!res.ok) {
+      const err = new Error("cloud post " + res.status);
+      err.status = res.status;
+      throw err;
+    }
+    return res.json().catch(() => ({}));
+  }
+  async function saveScore(record) {
+    // 先写本机（离线兜底），再尝试云端；云端失败不打断游玩
+    saveScoreLocal(record);
+    const statusEl = document.getElementById("board-cloud-status");
+    try {
+      await postCloudScore(record);
+      if (statusEl) statusEl.textContent = "成绩已同步到云端排行榜。";
+    } catch (e) {
+      console.warn("云端成绩提交失败", e);
+      toast("云端排行暂不可用，已存本机");
+      if (statusEl) {
+        statusEl.textContent = (e && e.status === 403)
+          ? "云端排行需认领站点后启用；本机成绩已保存。"
+          : "云端排行暂不可用，已存本机。";
+      }
+    }
+  }
+  async function fetchCloudScores(quizId) {
+    const res = await fetch(CLOUD_SCORES_URL + "?limit=100");
+    if (!res.ok) {
+      const err = new Error("cloud list " + res.status);
+      err.status = res.status;
+      throw err;
+    }
+    const data = await res.json();
+    const records = Array.isArray(data) ? data : (data.records || data.items || []);
+    const mapped = records.map(normalizeCloudRecord).filter(r => r.quizId === quizId);
+    return sortBoardList(mapped);
+  }
+  function clearLeaderboard() {
+    if (!currentQuiz) { toast("没有当前题库"); return; }
+    localStorage.removeItem(boardKey(currentQuiz.id));
+    renderBoard();
+    toast("已清空本机排行榜（云端记录需站点主人管理）");
+  }
+  function formatTime(ts) {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return "-";
+    const p = n => (n < 10 ? "0" : "") + n;
+    return (d.getMonth() + 1) + "/" + d.getDate() + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function paintBoardRows(list) {
+    const body = document.getElementById("board-body");
+    const empty = document.getElementById("board-empty");
+    body.innerHTML = "";
+    if (!list.length) {
+      empty.classList.remove("hidden");
+      return;
+    }
+    empty.classList.add("hidden");
+    list.slice(0, 20).forEach((r, i) => {
+      const tr = document.createElement("tr");
+      const elapsed = r.elapsed != null ? r.elapsed : r.seconds;
+      tr.innerHTML = "<td>" + (i + 1) + "</td><td>" + escapeHtml(r.name) +
+        "</td><td>" + r.score + "</td><td>" + elapsed + "s</td><td>" + formatTime(r.time) + "</td>";
+      body.appendChild(tr);
+    });
+  }
+  function renderWrongList() {
+    const wl = document.getElementById("wrong-list");
+    if (!lastWrong.length) {
+      wl.innerHTML = "<p class=\"hint\">本局没有错题，太棒了！（或尚未完成闯关）</p>";
+    } else {
+      wl.innerHTML = lastWrong.map(w =>
+        "<div class=\"wrong-item\"><div>" + escapeHtml(w.q) +
+        "</div><div class=\"ans\">正确答案：" + escapeHtml(String(w.a)) + "</div></div>"
+      ).join("");
+    }
+  }
+  async function renderBoard() {
+    const quizId = currentQuiz ? currentQuiz.id : null;
+    document.getElementById("board-quiz-name").textContent = currentQuiz
+      ? "当前套卷：「" + currentQuiz.title + "」"
+      : "请先载入题库，才能看到对应排行。";
+    const statusEl = document.getElementById("board-cloud-status");
+    const hintEl = document.getElementById("board-source-hint");
+    renderWrongList();
+    if (!quizId) {
+      paintBoardRows([]);
+      if (statusEl) statusEl.textContent = "";
+      return;
+    }
+    if (statusEl) statusEl.textContent = "正在拉取云端排行…";
+    try {
+      const cloudList = await fetchCloudScores(quizId);
+      paintBoardRows(cloudList);
+      if (hintEl) hintEl.textContent = "当前显示：云端排行榜（同学跨手机可见）。";
+      if (statusEl) statusEl.textContent = cloudList.length
+        ? ("云端共 " + cloudList.length + " 条本套题成绩。")
+        : "云端暂无本套题成绩，闯关后会上传。";
+    } catch (e) {
+      console.warn("云端排行拉取失败", e);
+      const localList = sortBoardList(getBoard(quizId));
+      paintBoardRows(localList);
+      if (hintEl) hintEl.textContent = "当前显示：本机排行榜（云端暂不可用）。";
+      if (statusEl) {
+        statusEl.textContent = (e && e.status === 403)
+          ? "云端排行需认领站点后启用；已显示本机榜。"
+          : "云端排行暂不可用，已显示本机榜。";
+      }
+    }
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+  }
+
+  // ---------- 启动 ----------
+  function init() {
+    renderTemplates();
+    // 优先从 URL hash 载入分享题库
+    const fromHash = loadQuizFromHash();
+    if (fromHash && fromHash.questions && fromHash.questions.length) {
+      currentQuiz = fromHash;
+      refreshHome();
+      toast("已从分享链接载入题库");
+    } else {
+      // 尝试恢复上次
+      try {
+        const raw = localStorage.getItem("t1_last_quiz");
+        if (raw) {
+          currentQuiz = JSON.parse(raw);
+          refreshHome();
+        }
+      } catch (_) {}
+      refreshHome();
+    }
+    // 预填自定义示例
+    const sample = CONFIG.customBank.map(item => {
+      if (item.options) {
+        const others = item.options.filter(o => String(o) !== String(item.a));
+        return item.q + "|" + item.a + "|" + others.join("|");
+      }
+      return item.q + "|" + item.a;
+    }).join("\n");
+    document.getElementById("custom-text").value = sample;
+  }
+  init();
+  </script>
+</body>
+</html>

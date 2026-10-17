@@ -1,0 +1,31 @@
+# ============================================================
+# 最小演示配置（第一次请用这个）
+# 默认只做：CSV → Excel；可选再加「导出_」前缀序号
+# 纯本地规则，不调用任何大模型 API。
+# 一键：bash run_demo.sh   或  run_demo.bat（Windows）
+# ============================================================
+
+input_dir: samples/input
+output_dir: samples/output
+
+jobs:
+  # 职场最常见：CSV 批量变成 Excel
+  - name: csv_to_xlsx
+    type: convert
+    from: csv
+    to: xlsx
+    pattern: "*.csv"
+    delimiter: ","
+    sheet_name: "Sheet1"
+    header: true
+    encoding: auto
+
+  # 可选：转完后给 Excel 统一加「导出_001_」前缀（不想要可整段删掉/注释）
+  - name: rename_exports
+    type: rename
+    pattern: "*.xlsx"
+    prefix: "导出_"
+    suffix: ""
+    sequence: true
+    sequence_start: 1
+    source: output

@@ -1,0 +1,19 @@
+# ============================================================
+# 场景 C：固定规则批量重命名（课堂精讲）
+# 纯本地规则，不调用任何大模型 API。
+# 一键：bash run_scene_c.sh
+# ============================================================
+
+input_dir: samples/input/scene_c
+output_dir: samples/output/scene_c
+
+jobs:
+  # 输入目录文件 → 统一前缀 + 三位序号，复制到输出目录
+  - name: archive_rename
+    type: rename
+    pattern: "*"
+    prefix: "归档_"
+    suffix: ""
+    sequence: true
+    sequence_start: 1
+    source: input

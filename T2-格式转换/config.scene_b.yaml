@@ -1,0 +1,23 @@
+# ============================================================
+# 场景 B：GBK → UTF-8 编码批量修复（课堂精讲）
+# 纯本地规则，不调用任何大模型 API。
+# 一键：bash run_scene_b.sh
+# ============================================================
+
+input_dir: samples/input/scene_b
+output_dir: samples/output/scene_b
+
+jobs:
+  # Windows 记事本 GBK 文本 → UTF-8
+  - name: fix_txt_gbk
+    type: encoding
+    from_encoding: gbk
+    to_encoding: utf-8
+    pattern: "*.txt"
+
+  # GBK 的 CSV → UTF-8 CSV（方便 Excel / 程序读取）
+  - name: fix_csv_gbk
+    type: encoding
+    from_encoding: gbk
+    to_encoding: utf-8
+    pattern: "*_gbk.csv"

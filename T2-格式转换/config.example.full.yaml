@@ -1,0 +1,53 @@
+# ============================================================
+# 完整能力示例（进阶 / 第二节课再打开）
+# 含：CSV→XLSX、txt 转码、gbk csv 转码、xlsx 重命名
+# 以及底部注释掉的 xlsx→csv 示例。
+# 纯本地规则，不调用任何大模型 API。
+# 用法：python format_batch.py --config config.example.full.yaml
+# 课堂精讲三种场景请用：config.scene_a/b/c.yaml + run_scene_*.sh|.bat
+# ============================================================
+
+input_dir: samples/input
+output_dir: samples/output
+
+jobs:
+  - name: csv_to_xlsx
+    type: convert
+    from: csv
+    to: xlsx
+    pattern: "*.csv"
+    delimiter: ","
+    sheet_name: "Sheet1"
+    header: true
+    encoding: auto
+
+  - name: fix_encoding_txt
+    type: encoding
+    from_encoding: gbk
+    to_encoding: utf-8
+    pattern: "*.txt"
+
+  - name: fix_encoding_csv_gbk
+    type: encoding
+    from_encoding: gbk
+    to_encoding: utf-8
+    pattern: "*_gbk.csv"
+
+  - name: rename_exports
+    type: rename
+    pattern: "*.xlsx"
+    prefix: "导出_"
+    suffix: ""
+    sequence: true
+    sequence_start: 1
+    source: output
+
+  # --- 下面是 xlsx → csv 示例（默认注释掉；取消注释并准备好 .xlsx 后即可用）---
+  # - name: xlsx_to_csv_example
+  #   type: convert
+  #   from: xlsx
+  #   to: csv
+  #   pattern: "*.xlsx"
+  #   delimiter: ","
+  #   sheet_name: "Sheet1"
+  #   header: true

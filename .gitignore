@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+samples/output/**
+!samples/output/.gitkeep
+!samples/output/scene_a/.gitkeep
+!samples/output/scene_b/.gitkeep
+!samples/output/scene_c/.gitkeep
+.DS_Store

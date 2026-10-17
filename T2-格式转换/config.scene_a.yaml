@@ -1,0 +1,30 @@
+# ============================================================
+# 场景 A：CSV ↔ Excel 批量互转（课堂精讲）
+# 纯本地规则，不调用任何大模型 API。
+# 一键：bash run_scene_a.sh
+# ============================================================
+
+input_dir: samples/input/scene_a
+output_dir: samples/output/scene_a
+
+jobs:
+  # 1) 至少 2 个 CSV → XLSX（职场：同事甩 CSV，老板要 Excel）
+  - name: csv_to_xlsx
+    type: convert
+    from: csv
+    to: xlsx
+    pattern: "*.csv"
+    delimiter: ","
+    sheet_name: "Sheet1"
+    header: true
+    encoding: utf-8
+
+  # 2) 预置 XLSX → CSV（职场：系统要 CSV，手里是 Excel）
+  - name: xlsx_to_csv
+    type: convert
+    from: xlsx
+    to: csv
+    pattern: "inventory.xlsx"
+    delimiter: ","
+    sheet_name: "库存"
+    header: true

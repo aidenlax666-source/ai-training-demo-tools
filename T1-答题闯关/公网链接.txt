@@ -1,0 +1,6 @@
+siteUrl=https://lively-mirage-sh6f.here.now/
+slug=lively-mirage-sh6f
+auth_mode=anonymous
+expires_at=2026-10-18T12:08:05.472Z (约北京时间 2026-10-18 20:08)
+claimUrl=https://here.now/c/7fuoThG6YrqDod-k
+说明=匿名站点 24 小时过期；打开 claimUrl 认领后可永久保存。认领后可启用跨设备云端排行榜。

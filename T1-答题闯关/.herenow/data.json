@@ -1,0 +1,21 @@
+{
+  "collections": {
+    "scores": {
+      "fields": {
+        "quiz_id": {"type": "string", "required": true, "maxLength": 80, "trim": true},
+        "name": {"type": "string", "required": true, "maxLength": 40, "trim": true},
+        "score": {"type": "integer", "required": true, "minimum": 0, "maximum": 100000},
+        "seconds": {"type": "integer", "required": true, "minimum": 0, "maximum": 86400},
+        "correct": {"type": "integer", "required": true, "minimum": 0, "maximum": 1000},
+        "total": {"type": "integer", "required": true, "minimum": 0, "maximum": 1000}
+      },
+      "access": {
+        "read": "public",
+        "insert": "public",
+        "update": "owner",
+        "delete": "owner"
+      },
+      "rateLimit": "30/hour/ip"
+    }
+  }
+}
