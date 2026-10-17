@@ -1,0 +1,10 @@
+{
+  "publishes": {
+    "silver-orbit-5rcs": {
+      "siteUrl": "https://silver-orbit-5rcs.here.now/",
+      "claimToken": "2z45dQqzM296AgvQ",
+      "claimUrl": "https://here.now/c/2z45dQqzM296AgvQ",
+      "expiresAt": "2026-10-18T12:29:44.022Z"
+    }
+  }
+}

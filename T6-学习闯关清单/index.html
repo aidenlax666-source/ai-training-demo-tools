@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <title>学习闯关清单 · 7 天 AI 上手</title>
+  <style>
+    :root {
+      /* 【改这里①】主题色 */
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --ok: #16a34a;
+      --warn: #ea580c;
+      --danger: #dc2626;
+      --bg: #f5f3ff;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --locked: #94a3b8;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: linear-gradient(160deg, #f5f3ff 0%, #f8fafc 50%, #ede9fe 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 16px 14px 48px; }
+    header.app { text-align: center; padding: 18px 8px 8px; }
+    header.app h1 { margin: 0; font-size: 1.55rem; color: var(--primary-dark); }
+    header.app p { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+    nav.tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin: 16px 0 20px;
+    }
+    nav.tabs button {
+      border: 2px solid var(--border); background: #fff; color: var(--text);
+      border-radius: 999px; padding: 10px 16px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer;
+    }
+    nav.tabs button.active {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card-box {
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px; border: 1px solid var(--border); margin-bottom: 14px;
+    }
+    label { display: block; font-weight: 600; margin: 12px 0 6px; font-size: 0.95rem; }
+    input[type="text"], input[type="url"], textarea, select {
+      width: 100%; padding: 12px 14px; font-size: 1rem; border: 2px solid var(--border);
+      border-radius: 12px; background: #fff; color: var(--text);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 18px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; background: var(--primary); color: #fff;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-ok { background: var(--ok); }
+    .btn-warn { background: var(--warn); }
+    .btn-danger { background: var(--danger); }
+    .btn-sm { padding: 8px 12px; font-size: 0.9rem; }
+    .btn-ghost { background: #f1f5f9; color: var(--text); }
+    .hint { color: var(--muted); font-size: 0.88rem; margin: 8px 0; }
+    .warn-box {
+      background: #fff7ed; border: 1px solid #fdba74; color: #9a3412;
+      border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0;
+      display: none;
+    }
+    .stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;
+    }
+    @media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+    .stat {
+      background: #f8fafc; border-radius: 14px; padding: 14px 12px; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .stat .label { color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+    .stat .value { font-size: 1.4rem; font-weight: 800; margin-top: 4px; color: var(--primary-dark); }
+    .progress-wrap {
+      background: #e2e8f0; border-radius: 999px; height: 18px; overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-bar {
+      height: 100%; width: 0%; background: var(--ok); border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .progress-label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .quest {
+      border: 2px solid var(--border); border-radius: 14px; margin-bottom: 12px;
+      overflow: hidden; background: #fff;
+    }
+    .quest.done { border-color: #86efac; }
+    .quest.locked { opacity: 0.72; }
+    .quest-head {
+      display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+      padding: 14px 14px 10px; cursor: pointer; user-select: none;
+    }
+    .quest-head .meta { flex: 1; min-width: 0; }
+    .quest-head .name { font-weight: 800; font-size: 1.05rem; word-break: break-word; }
+    .quest-head .desc { color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
+    .quest-head .badge {
+      flex-shrink: 0; border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; font-weight: 700;
+      background: #ede9fe; color: #5b21b6;
+    }
+    .quest.done .quest-head .badge { background: #dcfce7; color: #166534; }
+    .quest.locked .quest-head .badge { background: #f1f5f9; color: var(--locked); }
+    .quest-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
+    .quest.open .quest-body { display: block; }
+    .task {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 12px 4px; border-bottom: 1px solid var(--border);
+    }
+    .task:last-child { border-bottom: none; }
+    .task input[type="checkbox"] {
+      width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; accent-color: var(--ok);
+      cursor: pointer;
+    }
+    .task.done .task-text { text-decoration: line-through; color: var(--muted); }
+    .task-text { flex: 1; font-size: 1rem; word-break: break-word; }
+    .empty { text-align: center; color: var(--muted); padding: 24px 8px; }
+    .celeb {
+      display: none; text-align: center; background: #ecfdf5; border: 1px solid #6ee7b7;
+      color: #065f46; border-radius: 14px; padding: 14px; margin-bottom: 12px; font-weight: 700;
+    }
+    .celeb.show { display: block; animation: pop 0.4s ease; }
+    @keyframes pop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .mode-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+    .mode-row label.inline { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; margin: 0; }
+    .edit-quest {
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; background: #fafafa;
+    }
+    .edit-quest h3 { margin: 0 0 8px; font-size: 1rem; }
+    footer.tiny { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 20px; }
+    @media (max-width: 480px) { html { font-size: 17px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app">
+      <h1>学习闯关清单</h1>
+      <p>拆成关卡 · 勾选任务 · 进度本机存 · 清单可分享</p>
+    </header>
+
+    <div id="localhostWarn" class="warn-box">
+      ⚠️ 当前是本机地址（localhost / 127.0.0.1）。复制出来的链接<strong>只有你自己电脑能打开</strong>。
+      正式分享请用<strong>公网地址</strong>，或在下方「分享基址」填好公网 URL 再复制。
+    </div>
+
+    <nav class="tabs" id="tabs" role="tablist">
+      <button type="button" class="active" data-tab="home" onclick="showTab('home')">闯关</button>
+      <button type="button" data-tab="edit" onclick="showTab('edit')">新建/编辑</button>
+      <button type="button" data-tab="share" onclick="showTab('share')">备份/分享</button>
+    </nav>
+
+    <section id="panel-home" class="panel active">
+      <div class="card-box">
+        <div class="deck-title" id="planTitle" style="font-size:1.15rem;font-weight:700;margin-bottom:10px;">清单</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">已完成任务</div>
+            <div class="value" id="statDone">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">任务总数</div>
+            <div class="value" id="statTotal">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">总进度</div>
+            <div class="value" id="statPct">0%</div>
+          </div>
+        </div>
+        <div class="progress-label" id="progressLabel">进度 0%</div>
+        <div class="progress-wrap" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="mode-row">
+          <label class="inline">
+            <input type="checkbox" id="seqMode" checked onchange="onSeqModeChange()" />
+            推荐顺序解锁（完成一关再开下一关）
+          </label>
+        </div>
+        <p class="hint">勾选进度只存在本机浏览器；分享链接只带清单结构（关卡与任务文字），不带你的勾选。</p>
+      </div>
+      <div id="celebBox" class="celeb"></div>
+      <div id="questList"></div>
+      <div class="empty" id="emptyHint" style="display:none;">还没有关卡，去「新建/编辑」加几关吧。</div>
+    </section>
+
+    <section id="panel-edit" class="panel">
+      <div class="card-box">
+        <label for="editTitle">清单名称</label>
+        <input type="text" id="editTitle" placeholder="例如：本周学习关卡" />
+        <div class="row">
+          <button type="button" class="btn btn-outline" onclick="saveTitle()">保存名称</button>
+          <button type="button" class="btn btn-ghost" onclick="loadBuiltin()">载入示范清单</button>
+        </div>
+        <p class="hint">下面可增删关卡与任务。建议总共 ≤6 关，方便分享链接不太长。</p>
+      </div>
+      <div id="editList"></div>
+      <div class="card-box">
+        <strong>＋ 新增一关</strong>
+        <label for="newQuestName">关卡名称</label>
+        <input type="text" id="newQuestName" placeholder="例如：第 6 关 · 复习巩固" />
+        <label for="newQuestDesc">简短说明（可选）</label>
+        <input type="text" id="newQuestDesc" placeholder="这一关要达成什么" />
+        <label for="newQuestTasks">任务（每行一条）</label>
+        <textarea id="newQuestTasks" placeholder="任务 A&#10;任务 B&#10;任务 C"></textarea>
+        <div class="row">
+          <button type="button" class="btn" onclick="addQuest()">添加关卡</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-share" class="panel">
+      <div class="card-box">
+        <strong>导出 / 导入</strong>
+        <p class="hint">导出含清单结构；勾选进度另有本机备份。导入会替换当前清单结构（可选择是否清空进度）。</p>
+        <div class="row">
+          <button type="button" class="btn" onclick="exportJson()">导出 JSON</button>
+          <button type="button" class="btn btn-outline" onclick="triggerImport()">导入 JSON</button>
+          <button type="button" class="btn btn-ghost" onclick="exportProgress()">导出进度</button>
+          <button type="button" class="btn btn-warn btn-sm" onclick="clearProgress()">清空本机勾选</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json,text/plain" style="display:none" />
+        <label for="pasteJson">从文本粘贴导入</label>
+        <textarea id="pasteJson" placeholder='粘贴 {"title":"...","quests":[...]}'></textarea>
+        <div class="row">
+          <button type="button" class="btn btn-outline" onclick="importFromPaste()">从文本导入</button>
+        </div>
+      </div>
+      <div class="card-box">
+        <strong>复制分享链接（#q=）</strong>
+        <p class="hint">链接只编码清单结构，对方打开是同一套关卡；对方的勾选存在对方本机。</p>
+        <label for="shareBase">分享基址（公网 URL，可选）</label>
+        <input type="url" id="shareBase" placeholder="https://你的公网地址/" />
+        <div class="row">
+          <button type="button" class="btn btn-ok" onclick="copyShareLink()">复制分享链接</button>
+          <button type="button" class="btn btn-ghost" onclick="copyBackupText()">复制本机备份文本</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="tiny">零依赖单文件 · 进度 localStorage · 分享 #q= 清单结构</footer>
+  </div>
+
+<script>
+/* 【改这里②】内置示范清单（与 quests.json 一致，file:// 也能用） */
+const BUILTIN = {
+  title: "7 天 AI 上手闯关",
+  quests: [
+    {
+      id: "q1", name: "第 1 关 · 认识 AI", desc: "知道 AI 能帮你做什么、不能做什么",
+      tasks: [
+        { id: "t1a", text: "用白话向家人解释「什么是大模型」（30 秒）" },
+        { id: "t1b", text: "列出 3 件生活/工作里想让 AI 帮忙的事" },
+        { id: "t1c", text: "写下 1 条红线：哪些事不要交给 AI" }
+      ]
+    },
+    {
+      id: "q2", name: "第 2 关 · 会写提示词", desc: "把模糊想法写成可执行指令",
+      tasks: [
+        { id: "t2a", text: "用「角色 + 任务 + 格式」写一条提示词" },
+        { id: "t2b", text: "同一问题试 2 种写法，对比哪条更好用" },
+        { id: "t2c", text: "给提示词加约束：字数、语气、禁止事项" },
+        { id: "t2d", text: "把满意的提示词存进备忘录" }
+      ]
+    },
+    {
+      id: "q3", name: "第 3 关 · 日常小助手", desc: "用 AI 处理邮件、总结、清单",
+      tasks: [
+        { id: "t3a", text: "让 AI 帮你改一封礼貌的短邮件" },
+        { id: "t3b", text: "把一段长文总结成 5 条要点" },
+        { id: "t3c", text: "生成一份本周待办清单（可勾选）" }
+      ]
+    },
+    {
+      id: "q4", name: "第 4 关 · 学习与整理", desc: "用 AI 帮你学新东西、做笔记",
+      tasks: [
+        { id: "t4a", text: "选一个想学的小主题，让 AI 出「入门 3 步」" },
+        { id: "t4b", text: "让 AI 出 5 道自测题并核对答案" },
+        { id: "t4c", text: "把笔记整理成「知识卡片」格式（正反面）" },
+        { id: "t4d", text: "标出 1 处 AI 可能说错的地方并核实" }
+      ]
+    },
+    {
+      id: "q5", name: "第 5 关 · 做个小工具", desc: "把清单/卡片改成自己的并分享",
+      tasks: [
+        { id: "t5a", text: "打开本工具，把关卡改成自己的主题" },
+        { id: "t5b", text: "改一处皮肤颜色（--primary）" },
+        { id: "t5c", text: "导出 JSON 备份，或复制分享链接给同学" },
+        { id: "t5d", text: "用手机打开自己的公网链接自测一遍" }
+      ]
+    }
+  ]
+};
+
+const STORAGE_KEY = "t6_quest_plan_v1";
+const PROGRESS_KEY = "t6_quest_progress_v1";
+const SEQ_KEY = "t6_quest_seq_v1";
+const OPEN_KEY = "t6_quest_open_v1";
+
+let state = { title: "", quests: [] };
+let progress = {}; // taskId -> true
+let openMap = {};  // questId -> true
+let lastCeleb = "";
+
+function uid(prefix) {
+  return (prefix || "id") + "_" + Math.random().toString(36).slice(2, 9);
+}
+
+function normalizeQuests(list) {
+  return (list || []).map((q, qi) => ({
+    id: q.id || uid("q"),
+    name: String(q.name || q.title || ("关卡 " + (qi + 1))).trim(),
+    desc: String(q.desc || "").trim(),
+    tasks: (q.tasks || []).map((t, ti) => {
+      if (typeof t === "string") return { id: uid("t"), text: t.trim() };
+      return { id: t.id || uid("t"), text: String(t.text || t.title || "").trim() };
+    }).filter((t) => t.text)
+  })).filter((q) => q.name);
+}
+
+function loadProgress() {
+  try { progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}") || {}; }
+  catch (e) { progress = {}; }
+}
+
+function saveProgress() {
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+}
+
+function loadSeqMode() {
+  try {
+    const v = localStorage.getItem(SEQ_KEY);
+    if (v === null) return true;
+    return v === "1";
+  } catch (e) { return true; }
+}
+
+function saveSeqMode(on) {
+  try { localStorage.setItem(SEQ_KEY, on ? "1" : "0"); } catch (e) {}
+}
+
+function loadOpenMap() {
+  try { openMap = JSON.parse(localStorage.getItem(OPEN_KEY) || "{}") || {}; }
+  catch (e) { openMap = {}; }
+}
+
+function saveOpenMap() {
+  try { localStorage.setItem(OPEN_KEY, JSON.stringify(openMap)); } catch (e) {}
+}
+
+function persistPlan() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    title: state.title,
+    quests: state.quests
+  }));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      state.title = data.title || "我的闯关清单";
+      state.quests = normalizeQuests(data.quests);
+      return;
+    }
+  } catch (e) {}
+  state.title = BUILTIN.title;
+  state.quests = normalizeQuests(BUILTIN.quests);
+  persistPlan();
+}
+
+function isLocalHost() {
+  const h = location.hostname;
+  return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "0.0.0.0" || h === "";
+}
+
+function updateLocalhostWarn() {
+  const box = document.getElementById("localhostWarn");
+  if (box) box.style.display = isLocalHost() ? "block" : "none";
+}
+
+function showTab(name) {
+  document.querySelectorAll("nav.tabs button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+  document.querySelectorAll(".panel").forEach((p) => {
+    p.classList.toggle("active", p.id === "panel-" + name);
+  });
+  if (name === "edit") renderEdit();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function taskDone(tid) { return !!progress[tid]; }
+
+function questStats(q) {
+  const total = q.tasks.length;
+  const done = q.tasks.filter((t) => taskDone(t.id)).length;
+  return { total, done, complete: total > 0 && done === total };
+}
+
+function overallStats() {
+  let total = 0, done = 0;
+  state.quests.forEach((q) => {
+    const s = questStats(q);
+    total += s.total;
+    done += s.done;
+  });
+  const pct = total ? Math.round(done * 100 / total) : 0;
+  return { total, done, pct };
+}
+
+function isUnlocked(qi) {
+  if (!document.getElementById("seqMode").checked) return true;
+  if (qi === 0) return true;
+  for (let i = 0; i < qi; i++) {
+    if (!questStats(state.quests[i]).complete) return false;
+  }
+  return true;
+}
+
+function encodePlan(plan) {
+  const json = JSON.stringify({
+    title: plan.title || "闯关清单",
+    quests: (plan.quests || []).map((q) => ({
+      name: q.name,
+      desc: q.desc || "",
+      tasks: (q.tasks || []).map((t) => t.text)
+    }))
+  });
+  const bytes = new TextEncoder().encode(json);
+  let bin = "";
+  bytes.forEach((b) => { bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodePlan(hashPart) {
+  let s = hashPart.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  const bin = atob(s);
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  const json = new TextDecoder().decode(bytes);
+  const data = JSON.parse(json);
+  return {
+    title: data.title || "分享清单",
+    quests: normalizeQuests((data.quests || []).map((q) => ({
+      name: q.name || q.title,
+      desc: q.desc || "",
+      tasks: (q.tasks || []).map((t) => typeof t === "string" ? { text: t } : t)
+    })))
+  };
+}
+
+function getShareBase() {
+  const box = document.getElementById("shareBase");
+  const v = (box && box.value || "").trim();
+  if (v) return v.replace(/\/?$/, "/");
+  if (!isLocalHost()) {
+    return location.origin + location.pathname.replace(/index\.html$/, "");
+  }
+  return "";
+}
+
+function joinBaseAndHash(base, hash) {
+  let url = (base || "").split("#")[0].trim();
+  if (!url) return null;
+  if (!/\.html?$/i.test(url) && !url.endsWith("/")) url += "/";
+  return url + hash;
+}
+
+function copyShareLink() {
+  if (!state.quests.length) {
+    alert("还没有关卡，先加几关再分享。");
+    return;
+  }
+  if (state.quests.length > 6) {
+    if (!confirm("当前有 " + state.quests.length + " 关，分享链接会很长，可能被微信等截断。建议 ≤6 关。仍要复制？")) return;
+  }
+  const hash = "#q=" + encodePlan({ title: state.title, quests: state.quests });
+  let base = getShareBase();
+  if (!base) {
+    if (isLocalHost()) {
+      const tip = prompt(
+        "当前是本机地址，同学打不开。请粘贴公网基址（见 公网链接.txt）：",
+        "https://请填入发布后的公网地址/"
+      );
+      if (!tip) return;
+      base = tip.trim();
+      const box = document.getElementById("shareBase");
+      if (box) box.value = base;
+    } else {
+      base = location.href.split("#")[0];
+    }
+  }
+  const url = joinBaseAndHash(base, hash);
+  if (!url) { alert("缺少分享基址"); return; }
+  navigator.clipboard.writeText(url).then(() => {
+    alert("分享链接已复制！\n同学打开即可看到同一套关卡。\n（链接含 #q= 清单结构；勾选进度在各自本机）");
+  }).catch(() => {
+    prompt("请手动复制：", url);
+  });
+}
+
+function copyBackupText() {
+  const data = {
+    title: state.title,
+    quests: state.quests,
+    progress: progress
+  };
+  const text = JSON.stringify(data, null, 2);
+  navigator.clipboard.writeText(text).then(() => {
+    alert("本机备份文本已复制（含勾选进度）。");
+  }).catch(() => {
+    prompt("请手动复制：", text);
+  });
+}
+
+function exportJson() {
+  const data = {
+    title: state.title,
+    quests: state.quests.map((q) => ({
+      id: q.id,
+      name: q.name,
+      desc: q.desc,
+      tasks: q.tasks.map((t) => ({ id: t.id, text: t.text }))
+    }))
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.title || "quests").replace(/[\\/:*?"<>|]/g, "_") + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportProgress() {
+  const blob = new Blob([JSON.stringify({ progress }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "progress.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function clearProgress() {
+  if (!confirm("清空本机所有勾选进度？清单文字不会删。")) return;
+  progress = {};
+  saveProgress();
+  lastCeleb = "";
+  renderHome();
+  alert("已清空勾选。");
+}
+
+function triggerImport() {
+  document.getElementById("importFile").click();
+}
+
+function applyPlan(plan, notice, clearProg) {
+  state.title = plan.title || "我的闯关清单";
+  state.quests = normalizeQuests(plan.quests);
+  if (clearProg) {
+    progress = {};
+    saveProgress();
+  }
+  persistPlan();
+  renderAll();
+  if (notice) alert(notice);
+}
+
+function importFromPaste() {
+  const t = document.getElementById("pasteJson").value.trim();
+  if (!t) { alert("请先粘贴 JSON"); return; }
+  try {
+    const data = JSON.parse(t);
+    if (data.progress && typeof data.progress === "object") {
+      progress = data.progress;
+      saveProgress();
+    }
+    applyPlan(data, "已从文本导入 " + normalizeQuests(data.quests || []).length + " 关。", false);
+  } catch (e) {
+    alert("JSON 格式不对：" + e.message);
+  }
+}
+
+function loadBuiltin() {
+  applyPlan(BUILTIN, "已载入示范清单「7 天 AI 上手闯关」。", true);
+}
+
+async function tryLoadQuestsJson() {
+  try {
+    const res = await fetch("quests.json", { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function onSeqModeChange() {
+  saveSeqMode(document.getElementById("seqMode").checked);
+  renderHome();
+}
+
+function toggleTask(tid, questId) {
+  const was = !!progress[tid];
+  if (was) delete progress[tid];
+  else progress[tid] = true;
+  saveProgress();
+
+  const q = state.quests.find((x) => x.id === questId);
+  if (q) {
+    const s = questStats(q);
+    if (!was && s.complete) {
+      showCeleb("🎉 恭喜通关：「" + q.name + "」！下一关已解锁。");
+      lastCeleb = questId;
+      // auto-open next
+      const qi = state.quests.findIndex((x) => x.id === questId);
+      if (qi >= 0 && qi + 1 < state.quests.length) {
+        openMap[state.quests[qi + 1].id] = true;
+        saveOpenMap();
+      }
+    }
+    const all = overallStats();
+    if (all.total && all.done === all.total) {
+      showCeleb("🏆 全部关卡完成！太棒了，可以导出备份或分享给同学。");
+    }
+  }
+  renderHome();
+}
+
+function showCeleb(msg) {
+  const box = document.getElementById("celebBox");
+  box.textContent = msg;
+  box.classList.remove("show");
+  void box.offsetWidth;
+  box.classList.add("show");
+  setTimeout(() => { box.classList.remove("show"); }, 4500);
+}
+
+function toggleQuestOpen(qid) {
+  openMap[qid] = !openMap[qid];
+  saveOpenMap();
+  renderHome();
+}
+
+function renderHome() {
+  document.getElementById("planTitle").textContent = state.title || "闯关清单";
+  const st = overallStats();
+  document.getElementById("statDone").textContent = String(st.done);
+  document.getElementById("statTotal").textContent = String(st.total);
+  document.getElementById("statPct").textContent = st.pct + "%";
+  document.getElementById("progressLabel").textContent =
+    "进度 " + st.pct + "%（" + st.done + " / " + st.total + "）";
+  document.getElementById("progressBar").style.width = st.pct + "%";
+
+  const list = document.getElementById("questList");
+  const empty = document.getElementById("emptyHint");
+  list.innerHTML = "";
+  if (!state.quests.length) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  // ensure first unlocked open by default
+  if (!Object.keys(openMap).length && state.quests[0]) {
+    openMap[state.quests[0].id] = true;
+  }
+
+  state.quests.forEach((q, qi) => {
+    const s = questStats(q);
+    const unlocked = isUnlocked(qi);
+    const isOpen = !!openMap[q.id] && unlocked;
+    const div = document.createElement("div");
+    div.className = "quest" + (s.complete ? " done" : "") + (!unlocked ? " locked" : "") + (isOpen ? " open" : "");
+
+    let badgeText = s.done + "/" + s.total;
+    if (!unlocked) badgeText = "🔒 未解锁";
+    else if (s.complete) badgeText = "✅ 已通关";
+
+    div.innerHTML =
+      '<div class="quest-head" data-qid="' + escapeHtml(q.id) + '">' +
+      '<div class="meta"><div class="name">' + escapeHtml(q.name) + '</div>' +
+      (q.desc ? '<div class="desc">' + escapeHtml(q.desc) + '</div>' : "") +
+      '</div><span class="badge">' + badgeText + "</span></div>" +
+      '<div class="quest-body"></div>';
+
+    const body = div.querySelector(".quest-body");
+    if (!unlocked) {
+      body.innerHTML = '<p class="hint">完成上一关全部任务后解锁。</p>';
+    } else if (!q.tasks.length) {
+      body.innerHTML = '<p class="hint">这一关还没有任务，去「新建/编辑」添加。</p>';
+    } else {
+      q.tasks.forEach((t) => {
+        const row = document.createElement("div");
+        row.className = "task" + (taskDone(t.id) ? " done" : "");
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = taskDone(t.id);
+        cb.setAttribute("aria-label", t.text);
+        cb.addEventListener("change", () => toggleTask(t.id, q.id));
+        const span = document.createElement("div");
+        span.className = "task-text";
+        span.textContent = t.text;
+        row.appendChild(cb);
+        row.appendChild(span);
+        body.appendChild(row);
+      });
+    }
+
+    div.querySelector(".quest-head").addEventListener("click", () => {
+      if (!unlocked) {
+        alert("请先完成上一关。或取消勾选「推荐顺序解锁」。");
+        return;
+      }
+      toggleQuestOpen(q.id);
+    });
+    list.appendChild(div);
+  });
+}
+
+function saveTitle() {
+  state.title = document.getElementById("editTitle").value.trim() || "我的闯关清单";
+  persistPlan();
+  renderAll();
+  alert("清单名称已保存。");
+}
+
+function addQuest() {
+  const name = document.getElementById("newQuestName").value.trim();
+  const desc = document.getElementById("newQuestDesc").value.trim();
+  const lines = document.getElementById("newQuestTasks").value.split("\n")
+    .map((s) => s.trim()).filter(Boolean);
+  if (!name) { alert("请填写关卡名称"); return; }
+  if (!lines.length) { alert("请至少写一条任务（每行一条）"); return; }
+  if (state.quests.length >= 6) {
+    if (!confirm("已有 " + state.quests.length + " 关，再加分享链接可能很长。仍要添加？")) return;
+  }
+  const q = {
+    id: uid("q"),
+    name,
+    desc,
+    tasks: lines.map((text) => ({ id: uid("t"), text }))
+  };
+  state.quests.push(q);
+  openMap[q.id] = true;
+  saveOpenMap();
+  persistPlan();
+  document.getElementById("newQuestName").value = "";
+  document.getElementById("newQuestDesc").value = "";
+  document.getElementById("newQuestTasks").value = "";
+  renderAll();
+  alert("关卡已添加。");
+}
+
+function deleteQuest(qi) {
+  if (!confirm("删除这一关及其全部任务？")) return;
+  const q = state.quests[qi];
+  if (q) {
+    q.tasks.forEach((t) => { delete progress[t.id]; });
+    delete openMap[q.id];
+    saveProgress();
+    saveOpenMap();
+  }
+  state.quests.splice(qi, 1);
+  persistPlan();
+  renderAll();
+}
+
+function updateQuestFields(qi) {
+  const box = document.getElementById("eq-" + qi);
+  if (!box) return;
+  const name = box.querySelector(".eq-name").value.trim();
+  const desc = box.querySelector(".eq-desc").value.trim();
+  const lines = box.querySelector(".eq-tasks").value.split("\n").map((s) => s.trim()).filter(Boolean);
+  if (!name) { alert("关卡名称不能为空"); return; }
+  const old = state.quests[qi];
+  const oldByText = {};
+  (old.tasks || []).forEach((t) => { oldByText[t.text] = t.id; });
+  const tasks = lines.map((text) => ({
+    id: oldByText[text] || uid("t"),
+    text
+  }));
+  // drop progress for removed tasks
+  const keep = new Set(tasks.map((t) => t.id));
+  (old.tasks || []).forEach((t) => {
+    if (!keep.has(t.id)) delete progress[t.id];
+  });
+  saveProgress();
+  state.quests[qi] = { id: old.id, name, desc, tasks };
+  persistPlan();
+  renderAll();
+  alert("关卡已更新。");
+}
+
+function renderEdit() {
+  document.getElementById("editTitle").value = state.title || "";
+  const wrap = document.getElementById("editList");
+  wrap.innerHTML = "";
+  state.quests.forEach((q, qi) => {
+    const div = document.createElement("div");
+    div.className = "edit-quest card-box";
+    div.id = "eq-" + qi;
+    div.innerHTML =
+      "<h3>关卡 " + (qi + 1) + "</h3>" +
+      '<label>名称</label><input type="text" class="eq-name" value="' + escapeHtml(q.name) + '" />' +
+      '<label>说明</label><input type="text" class="eq-desc" value="' + escapeHtml(q.desc || "") + '" />' +
+      '<label>任务（每行一条）</label><textarea class="eq-tasks">' +
+      escapeHtml(q.tasks.map((t) => t.text).join("\n")) + "</textarea>" +
+      '<div class="row">' +
+      '<button type="button" class="btn btn-sm" data-act="save">保存本关</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-act="del">删除本关</button>' +
+      "</div>";
+    div.querySelector('[data-act="save"]').addEventListener("click", () => updateQuestFields(qi));
+    div.querySelector('[data-act="del"]').addEventListener("click", () => deleteQuest(qi));
+    wrap.appendChild(div);
+  });
+}
+
+function renderAll() {
+  updateLocalhostWarn();
+  renderHome();
+  if (document.getElementById("panel-edit").classList.contains("active")) renderEdit();
+}
+
+function tryParseHash() {
+  const h = location.hash || "";
+  if (h.startsWith("#q=")) {
+    try {
+      const plan = decodePlan(h.slice(3));
+      if (plan.quests.length) {
+        applyPlan(plan, null, false);
+        return true;
+      }
+    } catch (e) {
+      console.warn("hash decode failed", e);
+      alert("分享链接里的清单解析失败，请检查链接是否被截断。");
+    }
+  }
+  return false;
+}
+
+document.getElementById("importFile").addEventListener("change", (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (data.progress && typeof data.progress === "object") {
+        progress = data.progress;
+        saveProgress();
+      }
+      applyPlan(data, "已导入 " + normalizeQuests(data.quests || []).length + " 关。", false);
+    } catch (err) {
+      alert("导入失败：" + err.message);
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = "";
+});
+
+(async function boot() {
+  loadProgress();
+  loadOpenMap();
+  document.getElementById("seqMode").checked = loadSeqMode();
+  updateLocalhostWarn();
+  const fromHash = tryParseHash();
+  if (!fromHash) {
+    const hasLocal = !!localStorage.getItem(STORAGE_KEY);
+    if (!hasLocal) {
+      const filePlan = await tryLoadQuestsJson();
+      if (filePlan && (filePlan.quests || []).length) {
+        state.title = filePlan.title || BUILTIN.title;
+        state.quests = normalizeQuests(filePlan.quests);
+        persistPlan();
+      } else {
+        loadState();
+      }
+    } else {
+      loadState();
+    }
+  }
+  renderAll();
+  try {
+    const sb = sessionStorage.getItem("t6_share_base");
+    if (sb) document.getElementById("shareBase").value = sb;
+  } catch (e) {}
+  document.getElementById("shareBase").addEventListener("change", () => {
+    try { sessionStorage.setItem("t6_share_base", document.getElementById("shareBase").value.trim()); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
