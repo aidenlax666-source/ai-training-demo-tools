@@ -237,7 +237,7 @@
       </div>
       <div class="card-box">
         <strong>分享只读树洞（可选）</strong>
-        <p class="hint">把选中记录编码进链接的 <code>#e=</code>，对方打开只能看，不能改你的本机数据。笔数多时链接会变长，建议单次分享 <strong>≤30 条</strong>。</p>
+        <p class="hint">把选中记录编码进链接的 <code>#e=</code>，对方打开只能看，不能改你的本机数据。笔数多或正文很长时链接会变长，建议单次分享 <strong>≤30 条</strong>；编码后若超过约 2000 字符会再提示，优先导出 JSON。</p>
         <div class="row">
           <button type="button" class="btn btn-sm btn-ghost" onclick="selectAllShare(true)">全选</button>
           <button type="button" class="btn btn-sm btn-ghost" onclick="selectAllShare(false)">全不选</button>
@@ -254,8 +254,8 @@
     </section>
 
     <footer class="tiny">
-      培训示范 · 数据仅存本机 · 不能替代专业帮助<br />
-      若情绪持续难受，请寻求亲友或专业心理支持
+      面向成年学员的培训示范 · 不适合高中生及以下单独使用<br />
+      数据仅存本机 · 不能替代专业帮助 · 持续难受请寻求亲友或专业支持
     </footer>
   </div>
 
@@ -676,6 +676,9 @@
     const origin = getShareOrigin();
     const hash = "#e=" + encodePayload({ entries: picked });
     const url = origin.replace(/\/?$/, "/") + hash;
+    if (url.length > 2000) {
+      if (!confirm("分享链接已超过 2000 字符（条数少但正文很长也会超长），聊天软件可能截断。建议改用「导出 JSON」。仍要复制？")) return;
+    }
     try {
       await navigator.clipboard.writeText(url);
       alert("分享链接已复制！\n对方打开可看只读树洞（含 #e=）。\n请确认不是 127.0.0.1。");
