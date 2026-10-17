@@ -228,7 +228,7 @@
     <div id="view-home">
       <div class="card home-actions">
         <h2>选一个开始</h2>
-        <p class="hint" id="home-share-tip">同学打开「分享链接」即可玩同一套题；排行榜在云端站点<strong>认领后</strong>可跨手机同步（未认领时先存本机）。</p>
+        <p class="hint" id="home-share-tip">同学打开「分享链接」即可玩同一套题。请用<strong>公网地址</strong>分享（不要发本机 127.0.0.1）。排行榜在站点<strong>认领后</strong>可跨手机同步；未认领时先存本机。</p>
         <button class="btn btn-primary" onclick="showView('parent')">👨‍👩‍👧 家长出题</button>
         <button class="btn btn-success" id="btn-start-play" onclick="startPlayFromCurrent()" disabled>
           🚀 开始闯关
@@ -242,8 +242,8 @@
         <div class="btn-row">
           <button class="btn btn-outline btn-sm" onclick="copyShareLink()">📋 复制分享链接</button>
           <div class="hint" style="margin-top:8px;font-size:14px;line-height:1.5">
-            分享基址（可选）：<input id="shareBase" type="url" placeholder="https://你的公网地址/" style="width:min(100%,280px);font-size:14px;padding:6px 8px" />
-            <div style="opacity:.8;margin-top:4px">若当前是 127.0.0.1，请填公网地址再复制，否则同学打不开。</div>
+            分享基址（可选）：<input id="shareBase" type="url" placeholder="https://lively-mirage-sh6f.here.now/" style="width:min(100%,280px);font-size:14px;padding:6px 8px" />
+            <div style="opacity:.8;margin-top:4px">本机打开时请填上方公网基址再复制；公网打开则可直接复制。勿把 127.0.0.1 发给外网同学。</div>
           </div>
           <button class="btn btn-outline btn-sm" onclick="clearCurrentQuiz()">清空题库</button>
         </div>
@@ -264,14 +264,15 @@
         <div class="template-grid" id="template-list"></div>
         <div class="row-2">
           <div>
-            <label>题数</label>
-            <input type="number" id="tpl-count" value="5" min="3" max="50" />
+            <label>题数（分享建议 ≤15）</label>
+            <input type="number" id="tpl-count" value="5" min="3" max="15" />
           </div>
           <div>
             <label>套卷名称（可选）</label>
             <input type="text" id="tpl-title" placeholder="如：周末口算" />
           </div>
         </div>
+        <p class="hint">题数上限 15，方便复制分享链接（太长可能被微信截断）。</p>
         <button class="btn btn-primary" onclick="generateFromTemplate()">✨ 生成并载入</button>
         <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
       </div>
@@ -279,7 +280,7 @@
       <div class="card hidden" id="ptab-custom">
         <h2>粘贴自定义题目</h2>
         <p class="hint">
-          每行一题。<br />
+          每行一题（分享建议一共 ≤15 题）。<br />
           选择题：<code>题干|正确答案|错误1|错误2|错误3</code><br />
           填空题：<code>题干|答案</code>
         </p>
@@ -343,7 +344,7 @@
         <input type="text" id="ai-title" placeholder="如：AI·分数闯关" />
         <button class="btn btn-primary" id="btn-ai-gen" onclick="generateFromAI()">🤖 AI 根据知识库出题</button>
         <button class="btn btn-outline" onclick="generateFromRules()">⚡ 无 Key 规则出题（演示兜底）</button>
-        <p class="hint" id="ai-status"></p>
+        <p class="hint" id="ai-status">API Key 可选：有 Key 用 AI 出题；没有就点「规则出题」也能演示。</p>
         <pre id="ai-raw" class="ai-raw hidden"></pre>
         <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
       </div>
@@ -411,7 +412,7 @@
             <thead><tr><th>#</th><th>昵称</th><th>分数</th><th>用时</th><th>时间</th></tr></thead>
             <tbody id="board-body"></tbody>
           </table>
-          <p id="board-empty" class="hint hidden">还没有成绩，先去闯关吧！</p>
+          <p id="board-empty" class="hint hidden">还没有成绩。先出题并闯关，成绩会出现在这里。</p>
         </div>
         <button class="btn btn-outline btn-sm" onclick="clearLeaderboard()">清空本机本套题排行</button>
       </div>
@@ -592,6 +593,10 @@
       toast("题目为空，请重新生成");
       return;
     }
+    if (quiz.questions.length > 15) {
+      quiz.questions = quiz.questions.slice(0, 15);
+      toast("题量已限制为 15 题（分享更稳）");
+    }
     if (!quiz.id) quiz.id = uid();
     if (!quiz.title) quiz.title = "答题闯关";
     currentQuiz = quiz;
@@ -611,7 +616,7 @@
       btn.disabled = false;
       hint.textContent = "题库就绪，可以开始闯关啦！";
       info.style.display = "block";
-      meta.textContent = "「" + currentQuiz.title + "」共 " + currentQuiz.questions.length + " 题";
+      meta.textContent = "「" + currentQuiz.title + "」共 " + currentQuiz.questions.length + " 题（可复制公网分享链接）";
     } else {
       btn.disabled = true;
       hint.textContent = "请先出题，或打开分享链接自动载入题库。";
@@ -647,20 +652,30 @@
     return location.origin + location.pathname.replace(/[^/]*$/, "");
   }
 
-function copyShareLink() {
+  const PUBLIC_SITE = "https://lively-mirage-sh6f.here.now/";
+
+  function copyShareLink() {
     if (!currentQuiz) { toast("请先出题或载入题库"); return; }
+    if (currentQuiz.questions.length > 15) {
+      toast("超过 15 题，链接可能过长；建议减到 ≤15 再分享");
+    }
     const hash = "#q=" + encodeQuiz(currentQuiz);
     if (hash.length > 2000) toast("链接偏长，建议≤15题再分享（微信等可能截断）");
     let base = getShareOrigin();
     if (!base) {
-      const tip = prompt("当前是本机地址，同学打不开。请粘贴公网基址：", "https://lively-mirage-sh6f.here.now/");
+      const tip = prompt("当前是本机地址，同学打不开。请粘贴公网基址：", PUBLIC_SITE);
       if (!tip) { toast("已取消复制"); return; }
       base = tip.trim().replace(/\/?$/, "/");
       const box = document.getElementById("shareBase");
       if (box) box.value = base;
     }
+    // 禁止把 localhost 拼进分享链接
+    if (/localhost|127\.0\.0\.1|\[::1\]/i.test(base)) {
+      toast("不能用本机地址分享，请改填公网基址");
+      return;
+    }
     const url = base.replace(/\/?$/, "/") + hash;
-    navigator.clipboard.writeText(url).then(() => toast("已复制分享链接")).catch(() => prompt("请手动复制：", url));
+    navigator.clipboard.writeText(url).then(() => toast("已复制公网分享链接")).catch(() => prompt("请手动复制：", url));
   }
 
   // ---------- 家长：模板 ----------
@@ -682,7 +697,7 @@ function copyShareLink() {
   function generateFromTemplate() {
     const t = CONFIG.templates.find(x => x.id === selectedTemplateId);
     if (!t) return;
-    const count = Math.min(50, Math.max(3, parseInt(document.getElementById("tpl-count").value, 10) || t.count));
+    const count = Math.min(15, Math.max(3, parseInt(document.getElementById("tpl-count").value, 10) || t.count));
     const title = (document.getElementById("tpl-title").value || t.name).trim();
     const questions = genOralQuestions(t.op, t.max, count);
     setCurrentQuiz({ id: uid(), title, questions, templateId: t.id });
@@ -691,10 +706,14 @@ function copyShareLink() {
   function generateFromCustom() {
     const title = (document.getElementById("custom-title").value || "自定义闯关").trim();
     const text = document.getElementById("custom-text").value;
-    const questions = parseCustomText(text);
+    let questions = parseCustomText(text);
     if (!questions.length) {
-      toast("没解析到题目，请检查格式");
+      toast("没解析到题目，请检查格式（每行：题干|答案 或 题干|正确|错1|错2）");
       return;
+    }
+    if (questions.length > 15) {
+      toast("共 " + questions.length + " 题，已截取前 15 题便于分享");
+      questions = questions.slice(0, 15);
     }
     setCurrentQuiz({ id: uid(), title, questions });
     showView("home");
@@ -727,11 +746,15 @@ function copyShareLink() {
       }
       if (data.customBank && data.customBank.length) {
         CONFIG.customBank = data.customBank;
-        const questions = data.customBank.map(item => ({
+        let questions = data.customBank.map(item => ({
           q: item.q,
           a: String(item.a),
           options: item.options ? item.options.map(String) : null
         }));
+        if (questions.length > 15) {
+          toast("JSON 共 " + questions.length + " 题，载入前 15 题便于分享");
+          questions = questions.slice(0, 15);
+        }
         setCurrentQuiz({ id: uid(), title: "JSON示例题库", questions });
         document.getElementById("json-preview").textContent = JSON.stringify(data.customBank, null, 2);
         showView("home");
@@ -1062,6 +1085,12 @@ function copyShareLink() {
   document.getElementById("kb-file").addEventListener("change", function (ev) {
     const file = ev.target.files && ev.target.files[0];
     if (!file) return;
+    const okExt = /\.(txt|md)$/i.test(file.name) || /^text\//.test(file.type || "");
+    if (!okExt) {
+      toast("请上传 .txt 或 .md 文本文件");
+      ev.target.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = function () {
       document.getElementById("kb-text").value = String(reader.result || "");
@@ -1088,7 +1117,8 @@ function copyShareLink() {
     showView("ready");
   }
   function beginQuiz() {
-    const name = (document.getElementById("player-name").value || "匿名选手").trim().slice(0, 12);
+    let name = (document.getElementById("player-name").value || "").trim().slice(0, 12);
+    if (!name) { name = "匿名选手"; toast("未填昵称，以「匿名选手」上榜"); }
     localStorage.setItem("t1_player_name", name);
     playState = {
       name,
@@ -1152,7 +1182,7 @@ function copyShareLink() {
     playState.answered = true;
     const item = playState.questions[playState.index];
     const ok = String(opt).trim() === String(item.a).trim();
-    applyAnswer(ok, item);
+    applyAnswer(ok, item, opt);
     document.querySelectorAll(".option-btn").forEach(b => {
       b.disabled = true;
       if (String(b.textContent).trim() === String(item.a).trim()) b.classList.add("correct");
@@ -1166,9 +1196,9 @@ function copyShareLink() {
     playState.answered = true;
     const item = playState.questions[playState.index];
     const ok = val === String(item.a).trim();
-    applyAnswer(ok, item);
+    applyAnswer(ok, item, val);
   }
-  function applyAnswer(ok, item) {
+  function applyAnswer(ok, item, given) {
     const fb = document.getElementById("quiz-feedback");
     if (ok) {
       playState.score += CONFIG.scoreCorrect;
@@ -1177,7 +1207,7 @@ function copyShareLink() {
       fb.className = "feedback ok";
     } else {
       playState.score += CONFIG.scoreWrong;
-      playState.wrong.push({ q: item.q, a: item.a, your: (typeof given !== "undefined" ? given : null) });
+      playState.wrong.push({ q: item.q, a: item.a, your: given != null ? String(given) : "" });
       fb.textContent = "❌ 答错了，正确答案：" + item.a;
       fb.className = "feedback bad";
     }
@@ -1373,7 +1403,8 @@ function copyShareLink() {
     } else {
       wl.innerHTML = lastWrong.map(w =>
         "<div class=\"wrong-item\"><div>" + escapeHtml(w.q) +
-        "</div><div class=\"ans\">正确答案：" + escapeHtml(String(w.a)) + "</div></div>"
+        "</div><div class=\"ans\">你的答案：" + escapeHtml(w.your || "（未填）") +
+        " · 正确答案：" + escapeHtml(String(w.a)) + "</div></div>"
       ).join("");
     }
   }
@@ -1445,6 +1476,10 @@ function copyShareLink() {
       return item.q + "|" + item.a;
     }).join("\n");
     document.getElementById("custom-text").value = sample;
+    const shareBox = document.getElementById("shareBase");
+    if (shareBox && isLocalHost() && !shareBox.value) {
+      shareBox.value = PUBLIC_SITE;
+    }
   }
   init();
   </script>

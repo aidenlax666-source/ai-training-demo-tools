@@ -1,6 +1,6 @@
 siteUrl=https://lively-mirage-sh6f.here.now/
 slug=lively-mirage-sh6f
 auth_mode=anonymous
-expires_at=约发布后 24 小时（北京时间以认领页为准；本次更新约 2026-10-17 晚）
+expires_at=约发布后 24 小时（北京时间以认领页为准；本次体验打磨更新约 2026-10-17 20:29 北京时间）
 claimUrl=https://here.now/c/7fuoThG6YrqDod-k
-说明=匿名站点约 24 小时过期；打开 claimUrl 认领后可永久保存。认领后可启用跨设备云端排行榜。本版含知识库+AI出题。
+说明=匿名站点约 24 小时过期；打开 claimUrl 认领后可永久保存。认领后可启用跨设备云端排行榜。本版含知识库+AI出题；题量分享上限≤15；API Key 可选，规则出题兜底。
