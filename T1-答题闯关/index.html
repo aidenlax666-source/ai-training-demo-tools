@@ -188,6 +188,29 @@
       opacity: 0; pointer-events: none; transition: 0.3s;
     }
     .toast.show { opacity: 1; }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-family: inherit;
+    }
+    .kb-list { display: grid; gap: 8px; margin: 10px 0; }
+    .kb-item {
+      border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 12px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      background: #fafbff; flex-wrap: wrap;
+    }
+    .kb-item.active { border-color: var(--primary); background: #eef2ff; }
+    .kb-item .meta { font-size: 0.85rem; color: var(--muted); }
+    .ai-raw {
+      margin-top: 10px; max-height: 140px; overflow: auto; white-space: pre-wrap;
+      background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px;
+      padding: 8px; font-size: 0.8rem; color: #9a3412;
+    }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .home-actions .btn { margin-top: 8px; }
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     @media (max-width: 400px) {
@@ -199,7 +222,7 @@
 <body>
   <div class="app">
     <h1>🎯 答题闯关</h1>
-    <p class="subtitle">口算 · 知识点 · 同学比分</p>
+    <p class="subtitle">口算 · 知识库 · AI出题 · 同学比分</p>
 
     <!-- ===== 首页 ===== -->
     <div id="view-home">
@@ -233,6 +256,7 @@
         <button class="tab active" data-ptab="template" onclick="switchParentTab('template')">口算模板</button>
         <button class="tab" data-ptab="custom" onclick="switchParentTab('custom')">自定义题目</button>
         <button class="tab" data-ptab="json" onclick="switchParentTab('json')">JSON题库</button>
+        <button class="tab" data-ptab="kb" onclick="switchParentTab('kb')">知识库·AI</button>
       </div>
 
       <div class="card" id="ptab-template">
@@ -274,6 +298,56 @@
         <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
         <pre id="json-preview" class="hint" style="margin-top:12px;white-space:pre-wrap;max-height:160px;overflow:auto;background:#f8fafc;padding:10px;border-radius:8px;"></pre>
       </div>
+
+      <div class="card hidden" id="ptab-kb">
+        <h2>📚 知识库 · AI 出题</h2>
+        <p class="hint">粘贴或上传资料 → 保存知识库 → 用 AI（或无 Key 规则）出题。分享链接<strong>只含题目</strong>，不含 API Key / 知识库全文。</p>
+
+        <h3>① 知识库</h3>
+        <label>名称</label>
+        <input type="text" id="kb-name" placeholder="如：三年级分数笔记" maxlength="40" />
+        <label>资料正文（粘贴）</label>
+        <textarea id="kb-text" placeholder="把课文、笔记、考点粘贴到这里…"></textarea>
+        <p class="hint" id="kb-char-count">字数：0（送模型时最多取前 6000 字）</p>
+        <label>或上传 .txt / .md</label>
+        <input type="file" id="kb-file" accept=".txt,.md,text/plain,text/markdown" />
+        <div class="btn-row">
+          <button class="btn btn-outline btn-sm" onclick="saveKnowledgeBase()">💾 保存到本机</button>
+          <button class="btn btn-outline btn-sm" onclick="clearKbEditor()">清空编辑区</button>
+        </div>
+        <label>已保存的知识库</label>
+        <div class="kb-list" id="kb-list"><p class="hint">还没有保存的知识库。</p></div>
+
+        <h3>② AI 设置（仅存本机浏览器，不会进分享链接）</h3>
+        <label>API Base</label>
+        <input type="text" id="ai-base" placeholder="https://api.deepseek.com/v1" />
+        <label>API Key</label>
+        <input type="password" id="ai-key" placeholder="sk-…（不会上传到本站服务器）" autocomplete="off" />
+        <label>模型名</label>
+        <input type="text" id="ai-model" placeholder="deepseek-chat" />
+        <div class="row-2">
+          <div>
+            <label>题数</label>
+            <input type="number" id="ai-count" value="5" min="3" max="15" />
+          </div>
+          <div>
+            <label>题型</label>
+            <select id="ai-type">
+              <option value="mixed">混合</option>
+              <option value="choice">只要选择</option>
+              <option value="fill">只要填空</option>
+            </select>
+          </div>
+        </div>
+        <label>套卷名称（可选）</label>
+        <input type="text" id="ai-title" placeholder="如：AI·分数闯关" />
+        <button class="btn btn-primary" id="btn-ai-gen" onclick="generateFromAI()">🤖 AI 根据知识库出题</button>
+        <button class="btn btn-outline" onclick="generateFromRules()">⚡ 无 Key 规则出题（演示兜底）</button>
+        <p class="hint" id="ai-status"></p>
+        <pre id="ai-raw" class="ai-raw hidden"></pre>
+        <button class="btn btn-outline" onclick="showView('home')">返回首页</button>
+      </div>
+
     </div>
 
     <!-- ===== 闯关前：填昵称 ===== -->
@@ -629,9 +703,14 @@ function copyShareLink() {
     document.querySelectorAll("[data-ptab]").forEach(el => {
       el.classList.toggle("active", el.getAttribute("data-ptab") === name);
     });
-    ["template", "custom", "json"].forEach(n => {
+    ["template", "custom", "json", "kb"].forEach(n => {
       document.getElementById("ptab-" + n).classList.toggle("hidden", n !== name);
     });
+    if (name === "kb") {
+      loadAiSettingsIntoForm();
+      renderKbList();
+      updateKbCharCount();
+    }
   }
   async function loadFromJsonBank() {
     try {
@@ -665,6 +744,339 @@ function copyShareLink() {
         "\n提示：在本目录运行 python3 -m http.server 8080 再访问。";
     }
   }
+
+
+  // ---------- 知识库 + AI 出题 ----------
+  const KB_LS_KEY = "t1_kb_list";
+  const KB_ACTIVE_KEY = "t1_kb_active";
+  const AI_SETTINGS_KEY = "t1_ai_settings";
+  const KB_MAX_CHARS = 6000;
+
+  function getKbList() {
+    try { return JSON.parse(localStorage.getItem(KB_LS_KEY) || "[]"); }
+    catch (_) { return []; }
+  }
+  function setKbList(list) {
+    localStorage.setItem(KB_LS_KEY, JSON.stringify(list));
+  }
+  function getActiveKbId() {
+    return localStorage.getItem(KB_ACTIVE_KEY) || "";
+  }
+  function setActiveKbId(id) {
+    if (id) localStorage.setItem(KB_ACTIVE_KEY, id);
+    else localStorage.removeItem(KB_ACTIVE_KEY);
+  }
+  function updateKbCharCount() {
+    const text = document.getElementById("kb-text").value || "";
+    const el = document.getElementById("kb-char-count");
+    if (!el) return;
+    let tip = "字数：" + text.length;
+    if (text.length > KB_MAX_CHARS) tip += "（送模型将截断为前 " + KB_MAX_CHARS + " 字）";
+    else tip += "（送模型时最多取前 " + KB_MAX_CHARS + " 字）";
+    el.textContent = tip;
+  }
+  function clearKbEditor() {
+    document.getElementById("kb-name").value = "";
+    document.getElementById("kb-text").value = "";
+    document.getElementById("kb-file").value = "";
+    updateKbCharCount();
+  }
+  function saveKnowledgeBase() {
+    const name = (document.getElementById("kb-name").value || "").trim() || ("知识库" + new Date().toLocaleString());
+    const text = (document.getElementById("kb-text").value || "").trim();
+    if (!text) { toast("请先粘贴或上传资料"); return; }
+    const list = getKbList();
+    const id = uid();
+    list.unshift({ id, name, text, updatedAt: Date.now() });
+    setKbList(list.slice(0, 30));
+    setActiveKbId(id);
+    renderKbList();
+    toast("知识库已保存到本机");
+  }
+  function selectKb(id) {
+    const item = getKbList().find(k => k.id === id);
+    if (!item) return;
+    setActiveKbId(id);
+    document.getElementById("kb-name").value = item.name;
+    document.getElementById("kb-text").value = item.text;
+    updateKbCharCount();
+    renderKbList();
+  }
+  function deleteKb(id) {
+    let list = getKbList().filter(k => k.id !== id);
+    setKbList(list);
+    if (getActiveKbId() === id) setActiveKbId(list[0] ? list[0].id : "");
+    renderKbList();
+    toast("已删除");
+  }
+  function renderKbList() {
+    const box = document.getElementById("kb-list");
+    if (!box) return;
+    const list = getKbList();
+    const active = getActiveKbId();
+    if (!list.length) {
+      box.innerHTML = '<p class="hint">还没有保存的知识库。</p>';
+      return;
+    }
+    box.innerHTML = list.map(k => {
+      const cls = k.id === active ? "kb-item active" : "kb-item";
+      return '<div class="' + cls + '">' +
+        '<div><strong>' + escapeHtml(k.name) + '</strong>' +
+        '<div class="meta">' + (k.text || "").length + ' 字 · ' + new Date(k.updatedAt).toLocaleString() + '</div></div>' +
+        '<div class="btn-row" style="margin:0">' +
+        '<button class="btn btn-outline btn-sm" onclick="selectKb(\'' + k.id + '\')">选用</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="deleteKb(\'' + k.id + '\')">删除</button>' +
+        '</div></div>';
+    }).join("");
+  }
+  function getCurrentKbText() {
+    const fromEditor = (document.getElementById("kb-text").value || "").trim();
+    if (fromEditor) return fromEditor;
+    const id = getActiveKbId();
+    const item = getKbList().find(k => k.id === id);
+    return item ? (item.text || "").trim() : "";
+  }
+  function truncateKb(text) {
+    if (text.length <= KB_MAX_CHARS) return text;
+    return text.slice(0, KB_MAX_CHARS);
+  }
+  function loadAiSettingsIntoForm() {
+    let s = { base: "https://api.deepseek.com/v1", key: "", model: "deepseek-chat" };
+    try {
+      const raw = localStorage.getItem(AI_SETTINGS_KEY);
+      if (raw) s = Object.assign(s, JSON.parse(raw));
+    } catch (_) {}
+    document.getElementById("ai-base").value = s.base || "https://api.deepseek.com/v1";
+    document.getElementById("ai-key").value = s.key || "";
+    document.getElementById("ai-model").value = s.model || "deepseek-chat";
+  }
+  function saveAiSettingsFromForm() {
+    const s = {
+      base: (document.getElementById("ai-base").value || "").trim() || "https://api.deepseek.com/v1",
+      key: (document.getElementById("ai-key").value || "").trim(),
+      model: (document.getElementById("ai-model").value || "").trim() || "deepseek-chat"
+    };
+    localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify(s));
+    return s;
+  }
+  function setAiStatus(msg, raw) {
+    const st = document.getElementById("ai-status");
+    const rawEl = document.getElementById("ai-raw");
+    if (st) st.textContent = msg || "";
+    if (rawEl) {
+      if (raw) {
+        rawEl.textContent = String(raw).slice(0, 2000);
+        rawEl.classList.remove("hidden");
+      } else {
+        rawEl.textContent = "";
+        rawEl.classList.add("hidden");
+      }
+    }
+  }
+  function normalizeAiQuestions(arr) {
+    if (!Array.isArray(arr)) return [];
+    const out = [];
+    for (const item of arr) {
+      if (!item || item.q == null || item.a == null) continue;
+      const q = String(item.q).trim();
+      const a = String(item.a).trim();
+      if (!q || !a) continue;
+      let options = null;
+      if (Array.isArray(item.options) && item.options.length >= 2) {
+        options = item.options.map(String);
+        if (!options.includes(a)) options = [a].concat(options).slice(0, 4);
+      }
+      out.push({ q, a, options });
+    }
+    return out;
+  }
+  function extractJsonArray(text) {
+    let s = String(text || "").trim();
+    s = s.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+    try { return JSON.parse(s); } catch (_) {}
+    const start = s.indexOf("[");
+    const end = s.lastIndexOf("]");
+    if (start >= 0 && end > start) {
+      try { return JSON.parse(s.slice(start, end + 1)); } catch (_) {}
+    }
+    return null;
+  }
+  function friendlyAiError(err, status) {
+    const msg = (err && err.message) ? err.message : String(err || "");
+    if (status === 401 || /401|unauthorized|invalid.*key/i.test(msg))
+      return "API Key 无效或未填对（401）。请检查 Key。";
+    if (status === 402 || /balance|quota|insufficient/i.test(msg))
+      return "账户余额不足或额度用完，请充值后再试。";
+    if (status === 429) return "请求太频繁，请稍后再试。";
+    if (/Failed to fetch|NetworkError|CORS|cors/i.test(msg))
+      return "网络或跨域（CORS）失败：该 API 可能不允许浏览器直连。可换 DeepSeek，或用「规则出题」演示。";
+    if (status) return "请求失败（HTTP " + status + "）：" + msg.slice(0, 120);
+    return "出题失败：" + msg.slice(0, 160);
+  }
+  function buildAiPrompt(kbText, count, type) {
+    let typeHint = "混合选择题与填空题；选择题必须带 options（含正确答案共 4 个选项）。";
+    if (type === "choice") typeHint = "只要选择题；每题必须有 options（含正确答案共 4 个）。";
+    if (type === "fill") typeHint = "只要填空题；不要 options 字段。";
+    return (
+      "你是出题助手。只根据下面「知识库」内容出题，不要编造知识库没有的事实。\n" +
+      "题数：" + count + "。题型要求：" + typeHint + "\n" +
+      "严格只输出 JSON 数组，不要 markdown 围栏，不要解释。元素格式：\n" +
+      '[{"q":"题干","a":"正确答案","options":["正确","错1","错2","错3"]}]\n' +
+      "填空题省略 options。答案要简短。\n\n" +
+      "【知识库】\n" + kbText
+    );
+  }
+  async function generateFromAI() {
+    const kbFull = getCurrentKbText();
+    if (!kbFull) { toast("请先填写或选用知识库"); return; }
+    const settings = saveAiSettingsFromForm();
+    if (!settings.key) {
+      toast("未填 API Key，改用规则出题");
+      generateFromRules();
+      return;
+    }
+    const count = Math.min(15, Math.max(3, parseInt(document.getElementById("ai-count").value, 10) || 5));
+    const type = document.getElementById("ai-type").value || "mixed";
+    const title = (document.getElementById("ai-title").value || "").trim() || ("AI·" + (document.getElementById("kb-name").value || "知识库闯关").trim());
+    const kbText = truncateKb(kbFull);
+    if (kbFull.length > KB_MAX_CHARS) toast("资料较长，已截断前 " + KB_MAX_CHARS + " 字送模型");
+
+    const btn = document.getElementById("btn-ai-gen");
+    btn.disabled = true;
+    setAiStatus("正在请求 AI 出题…");
+    let status = 0;
+    try {
+      let base = settings.base.replace(/\/+$/, "");
+      if (!/\/v1$/i.test(base) && !/chat\/completions$/i.test(base)) {
+        // keep as-is; user may already include path
+      }
+      const url = /chat\/completions$/i.test(base) ? base : (base + "/chat/completions");
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + settings.key
+        },
+        body: JSON.stringify({
+          model: settings.model,
+          temperature: 0.4,
+          messages: [
+            { role: "system", content: "你只输出合法 JSON 数组，不要其它文字。" },
+            { role: "user", content: buildAiPrompt(kbText, count, type) }
+          ]
+        })
+      });
+      status = res.status;
+      const rawText = await res.text();
+      if (!res.ok) {
+        let detail = rawText;
+        try { detail = JSON.parse(rawText).error.message || rawText; } catch (_) {}
+        throw Object.assign(new Error(detail), { status });
+      }
+      let data;
+      try { data = JSON.parse(rawText); } catch (_) { throw new Error("接口返回不是 JSON"); }
+      const content = (((data.choices || [])[0] || {}).message || {}).content || "";
+      const parsed = extractJsonArray(content);
+      const questions = normalizeAiQuestions(parsed);
+      if (!questions.length) {
+        setAiStatus("解析失败：模型没有返回合法题目 JSON", content || rawText);
+        toast("解析失败，请看下方原始片段");
+        return;
+      }
+      setCurrentQuiz({ id: uid(), title, questions: questions.slice(0, count), source: "ai" });
+      setAiStatus("成功生成 " + Math.min(questions.length, count) + " 题，已载入。可复制分享链接（不含 Key）。");
+      toast("AI 出题成功！");
+      showView("home");
+    } catch (e) {
+      setAiStatus(friendlyAiError(e, e.status || status), e.message);
+      toast(friendlyAiError(e, e.status || status));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  function splitKbSentences(text) {
+    return text
+      .split(/[\n。！？；;!?]+/)
+      .map(s => s.replace(/\s+/g, " ").trim())
+      .filter(s => s.length >= 8 && s.length <= 120);
+  }
+  function pickKeywords(sentence) {
+    const parts = sentence.replace(/[，,、：:（）()《》""''\s]/g, " ").split(" ").filter(w => w.length >= 2);
+    return parts;
+  }
+  function generateFromRules() {
+    const kbFull = getCurrentKbText();
+    if (!kbFull) { toast("请先填写或选用知识库"); return; }
+    const count = Math.min(15, Math.max(3, parseInt(document.getElementById("ai-count").value, 10) || 5));
+    const type = document.getElementById("ai-type").value || "mixed";
+    const title = (document.getElementById("ai-title").value || "").trim() || ("规则·" + (document.getElementById("kb-name").value || "知识库闯关").trim());
+    const sentences = splitKbSentences(kbFull);
+    if (sentences.length < 2) {
+      toast("资料太短，请多贴几句完整话");
+      return;
+    }
+    const pool = shuffle(sentences.slice());
+    const questions = [];
+    let i = 0;
+    while (questions.length < count && i < pool.length * 2) {
+      const s = pool[i % pool.length];
+      i++;
+      const wantChoice = type === "choice" || (type === "mixed" && questions.length % 2 === 0);
+      const words = pickKeywords(s);
+      if (wantChoice && words.length >= 2) {
+        const answer = words[Math.floor(words.length / 2)] || words[0];
+        const distractors = shuffle(words.filter(w => w !== answer)).slice(0, 3);
+        while (distractors.length < 3) {
+          const other = pool[(i + distractors.length) % pool.length];
+          const ow = pickKeywords(other).find(w => w !== answer && !distractors.includes(w));
+          if (ow) distractors.push(ow);
+          else distractors.push("选项" + (distractors.length + 1));
+        }
+        const stem = s.length > 40 ? (s.slice(0, 40) + "…") : s;
+        questions.push({
+          q: "根据资料，下列哪一项出现在这句话中：「" + stem + "」？",
+          a: answer,
+          options: shuffle([answer].concat(distractors.slice(0, 3)))
+        });
+      } else {
+        const words2 = pickKeywords(s).filter(w => w.length >= 2);
+        if (!words2.length) continue;
+        const answer = words2[Math.min(words2.length - 1, 1)];
+        const blanked = s.replace(answer, "____");
+        if (blanked === s) continue;
+        questions.push({ q: "填空：" + blanked, a: answer, options: null });
+      }
+    }
+    if (!questions.length) {
+      toast("规则出题失败：换一段更完整的资料试试");
+      return;
+    }
+    setCurrentQuiz({ id: uid(), title, questions: questions.slice(0, count), source: "rules" });
+    setAiStatus("已用规则从知识库生成 " + Math.min(questions.length, count) + " 题（无 API Key 兜底）。");
+    toast("规则出题成功！");
+    showView("home");
+  }
+
+  // 知识库编辑区事件
+  document.getElementById("kb-text").addEventListener("input", updateKbCharCount);
+  document.getElementById("kb-file").addEventListener("change", function (ev) {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      document.getElementById("kb-text").value = String(reader.result || "");
+      if (!document.getElementById("kb-name").value) {
+        document.getElementById("kb-name").value = file.name.replace(/\.(txt|md)$/i, "");
+      }
+      updateKbCharCount();
+      toast("已读入文件");
+    };
+    reader.onerror = function () { toast("读取文件失败"); };
+    reader.readAsText(file, "utf-8");
+  });
+  ["ai-base", "ai-key", "ai-model"].forEach(id => {
+    document.getElementById(id).addEventListener("change", saveAiSettingsFromForm);
+  });
 
   // ---------- 闯关 ----------
   function startPlayFromCurrent() {

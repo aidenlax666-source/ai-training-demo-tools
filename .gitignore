@@ -7,3 +7,8 @@ samples/output/**
 !samples/output/scene_b/.gitkeep
 !samples/output/scene_c/.gitkeep
 .DS_Store
+
+# never commit local secrets / editor junk
+*.local.json
+.env
+.env.*
