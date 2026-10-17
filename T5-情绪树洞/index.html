@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <title>情绪树洞 · 把心里话写下来</title>
+  <style>
+    :root {
+      /* 【改这里①】主题色（柔和紫 / 暖色，区别于 T4 青绿、T3 蓝） */
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-soft: #ede9fe;
+      --ok: #059669;
+      --warn: #ea580c;
+      --danger: #dc2626;
+      --bg: #faf5ff;
+      --card: #ffffff;
+      --text: #1e1b4b;
+      --muted: #6b7280;
+      --border: #e9d5ff;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+      --warm: #fef3c7;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: linear-gradient(160deg, #faf5ff 0%, #fff7ed 45%, #f5f3ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 16px 14px 48px; }
+    header.app { text-align: center; padding: 18px 8px 8px; }
+    header.app h1 { margin: 0; font-size: 1.55rem; color: var(--primary-dark); }
+    header.app p { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+    nav.tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin: 16px 0 20px;
+    }
+    nav.tabs button {
+      border: 2px solid var(--border); background: #fff; color: var(--text);
+      border-radius: 999px; padding: 10px 16px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer;
+    }
+    nav.tabs button.active {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    nav.tabs button:disabled { cursor: not-allowed; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card-box {
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 18px; border: 1px solid var(--border); margin-bottom: 14px;
+    }
+    label { display: block; font-weight: 600; margin: 12px 0 6px; font-size: 0.95rem; }
+    input[type="text"], input[type="date"], input[type="url"],
+    textarea, select {
+      width: 100%; padding: 12px 14px; font-size: 1rem; border: 2px solid var(--border);
+      border-radius: 12px; background: #fff; color: var(--text);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 18px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; background: var(--primary); color: #fff;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-outline { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+    .btn-ok { background: var(--ok); }
+    .btn-warn { background: var(--warn); }
+    .btn-danger { background: var(--danger); }
+    .btn-sm { padding: 8px 12px; font-size: 0.9rem; }
+    .btn-ghost { background: #f5f3ff; color: var(--text); }
+    .hint { color: var(--muted); font-size: 0.88rem; margin: 8px 0; }
+    .warn-box {
+      background: #fff7ed; border: 1px solid #fdba74; color: #9a3412;
+      border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0;
+      display: none;
+    }
+    .readonly-banner {
+      background: #f5f3ff; border: 1px solid #c4b5fd; color: #5b21b6;
+      border-radius: 12px; padding: 10px 12px; font-size: 0.9rem; margin: 10px 0;
+      display: none;
+    }
+    .mood-chips {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px;
+    }
+    .mood-chips button {
+      border: 2px solid var(--border); background: #fff; border-radius: 999px;
+      padding: 8px 14px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text);
+    }
+    .mood-chips button.selected {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    .mood-tag {
+      display: inline-block; background: var(--primary-soft); color: var(--primary-dark);
+      border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; font-weight: 600;
+      margin-right: 6px;
+    }
+    .list { list-style: none; padding: 0; margin: 0; }
+    .list li {
+      padding: 14px 12px; border-bottom: 1px solid var(--border);
+    }
+    .list li:last-child { border-bottom: none; }
+    .list .head {
+      display: flex; gap: 8px; align-items: flex-start; justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .list .title { font-weight: 700; font-size: 1.05rem; word-break: break-word; }
+    .list .date { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+    .list .body {
+      color: var(--text); font-size: 0.95rem; margin-top: 8px; white-space: pre-wrap;
+      word-break: break-word; display: none;
+    }
+    .list .body.open { display: block; }
+    .list .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .empty { text-align: center; color: var(--muted); padding: 24px 8px; }
+    .stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
+    }
+    @media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+    .stat {
+      background: #faf5ff; border-radius: 14px; padding: 14px 12px; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .stat .label { color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+    .stat .value { font-size: 1.45rem; font-weight: 800; margin-top: 4px; color: var(--primary-dark); }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .filter-row select { width: auto; min-width: 140px; }
+    .share-select { margin-top: 8px; }
+    .entry-check {
+      display: flex; gap: 10px; align-items: flex-start; padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .entry-check:last-child { border-bottom: none; }
+    .entry-check input { margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0; }
+    footer.tiny {
+      text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 20px;
+      line-height: 1.6; padding: 0 8px;
+    }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app">
+      <h1>情绪树洞</h1>
+      <p>把心里话写下来 · 只存在本机</p>
+    </header>
+
+    <div id="localhostWarn" class="warn-box">
+      ⚠️ 当前是本机地址（localhost / 127.0.0.1）。复制出来的链接<strong>只有你自己电脑能打开</strong>。
+      正式分享请用<strong>公网地址</strong>，或在下方「分享基址」填好公网 URL 再复制。
+    </div>
+    <div id="readonlyBanner" class="readonly-banner">
+      👀 你正在看<strong>分享只读树洞</strong>（链接带 <code>#e=</code>）。改记录请打开公网首页自己写；本页不会写入你的本机数据。
+      <div class="row"><button type="button" class="btn btn-sm btn-outline" onclick="exitReadonly()">回到可编辑首页</button></div>
+    </div>
+
+    <nav class="tabs" id="tabs" role="tablist">
+      <button type="button" class="active" data-tab="write" onclick="showTab('write')">树洞</button>
+      <button type="button" data-tab="list" onclick="showTab('list')">我的记录</button>
+      <button type="button" data-tab="share" onclick="showTab('share')">备份/分享</button>
+    </nav>
+
+    <!-- 树洞：写一笔 -->
+    <section id="panel-write" class="panel active">
+      <div class="card-box">
+        <label>心情标签</label>
+        <div class="mood-chips" id="moodChips" role="group" aria-label="心情"></div>
+        <input type="hidden" id="entryMood" value="平静" />
+
+        <label for="entryTitle">标题（可选）</label>
+        <input type="text" id="entryTitle" placeholder="例如：今天还好" maxlength="40" />
+
+        <label for="entryBody">心里话</label>
+        <textarea id="entryBody" placeholder="写给自己看就好，不用说给别人听……" maxlength="2000"></textarea>
+
+        <label for="entryDate">日期</label>
+        <input type="date" id="entryDate" />
+
+        <div class="row">
+          <button type="button" class="btn btn-ok" onclick="saveEntry()">放进树洞</button>
+          <button type="button" class="btn btn-ghost" onclick="resetWriteForm()">清空</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="loadDemo()">载入示范</button>
+        </div>
+        <p class="hint">保存后进「我的记录」。数据只存在本机浏览器，换手机 / 清缓存前请先导出备份。</p>
+      </div>
+    </section>
+
+    <!-- 我的记录 -->
+    <section id="panel-list" class="panel">
+      <div class="card-box">
+        <div class="stats">
+          <div class="stat">
+            <div class="label">记录条数</div>
+            <div class="value" id="statCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">当前筛选</div>
+            <div class="value" id="statFilter" style="font-size:1.1rem;">全部</div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <label for="moodFilter" style="margin:0;font-weight:600;">按心情</label>
+          <select id="moodFilter" onchange="renderList()">
+            <option value="">全部</option>
+          </select>
+        </div>
+        <ul class="list" id="entryList"></ul>
+        <div class="empty" id="emptyHint" style="display:none;">还没有记录，去「树洞」写一笔吧。</div>
+      </div>
+    </section>
+
+    <!-- 备份/分享 -->
+    <section id="panel-share" class="panel">
+      <div class="card-box">
+        <strong>本机备份</strong>
+        <p class="hint">导出 JSON 可存到网盘；导入可恢复。推荐作为主备份方式。</p>
+        <div class="row">
+          <button type="button" class="btn btn-outline" onclick="exportJson()">导出 JSON</button>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('importFile').click()">导入 JSON</button>
+          <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn-ok" onclick="copyBackupText()">复制本机备份（文本）</button>
+        </div>
+        <label for="pasteBox">或粘贴 JSON 导入</label>
+        <textarea id="pasteBox" placeholder='{"entries":[{"id":"...","mood":"平静","title":"","body":"...","date":"YYYY-MM-DD"}]}'></textarea>
+        <div class="row">
+          <button type="button" class="btn btn-sm" onclick="importPaste()">从文本导入</button>
+        </div>
+      </div>
+      <div class="card-box">
+        <strong>分享只读树洞（可选）</strong>
+        <p class="hint">把选中记录编码进链接的 <code>#e=</code>，对方打开只能看，不能改你的本机数据。笔数多时链接会变长，建议单次分享 <strong>≤30 条</strong>。</p>
+        <div class="row">
+          <button type="button" class="btn btn-sm btn-ghost" onclick="selectAllShare(true)">全选</button>
+          <button type="button" class="btn btn-sm btn-ghost" onclick="selectAllShare(false)">全不选</button>
+        </div>
+        <div class="share-select" id="shareSelectList"></div>
+        <label for="shareBase">分享基址（公网地址，可选）</label>
+        <input type="url" id="shareBase" placeholder="https://你的公网地址/" />
+        <p class="hint">若你在本机调试，可填公网基址，复制出的链接就会用公网域名，而不是 127.0.0.1。</p>
+        <div class="row">
+          <button type="button" class="btn" onclick="copyShareLink()">复制只读分享链接（#e=）</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="copyEmptyTemplate()">复制「空模板」说明链接</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="tiny">
+      培训示范 · 数据仅存本机 · 不能替代专业帮助<br />
+      若情绪持续难受，请寻求亲友或专业心理支持
+    </footer>
+  </div>
+
+  <script>
+  /* 【改这里②】示范记录：改心情 / 正文就能当自己的模板 */
+  const BUILTIN = {
+    entries: [
+      {
+        id: "d1",
+        mood: "感恩",
+        title: "晚饭后散步",
+        body: "今天傍晚和家人走了一圈，风不大，聊了几句琐事。没什么大事，但心里松了一点。",
+        date: "2026-10-16"
+      },
+      {
+        id: "d2",
+        mood: "焦虑",
+        title: "明天要开会",
+        body: "脑子一直转：材料够不够、会不会被问住。写下来之后，先睡一觉再说。",
+        date: "2026-10-15"
+      },
+      {
+        id: "d3",
+        mood: "平静",
+        title: "",
+        body: "没有特别想说的，就是把今天过完了。也算一种平静。",
+        date: "2026-10-14"
+      }
+    ]
+  };
+
+  const STORAGE_KEY = "ai-training-demo-t5-treehole-v1";
+  const MOODS = ["平静", "开心", "焦虑", "难过", "愤怒", "疲惫", "感恩", "其他"];
+
+  let state = { entries: [] };
+  let readonlyMode = false;
+  let selectedMood = "平静";
+
+  function todayStr() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function uid() {
+    return "e" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function normalizeEntry(e) {
+    if (!e || typeof e !== "object") return null;
+    const body = String(e.body || "").trim();
+    if (!body) return null;
+    let mood = String(e.mood || "其他").slice(0, 10);
+    if (MOODS.indexOf(mood) < 0) mood = "其他";
+    return {
+      id: String(e.id || uid()),
+      mood: mood,
+      title: String(e.title || "").slice(0, 40),
+      body: body.slice(0, 2000),
+      date: String(e.date || todayStr()).slice(0, 12)
+    };
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return null;
+      return {
+        entries: Array.isArray(o.entries) ? o.entries.map(normalizeEntry).filter(Boolean) : []
+      };
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function saveState() {
+    if (readonlyMode) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ entries: state.entries }));
+  }
+
+  function isLocalHost() {
+    const h = location.hostname;
+    return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "0.0.0.0" || h === "";
+  }
+
+  function updateLocalhostWarn() {
+    const box = document.getElementById("localhostWarn");
+    if (box) box.style.display = isLocalHost() ? "block" : "none";
+  }
+
+  function buildMoodChips() {
+    const wrap = document.getElementById("moodChips");
+    wrap.innerHTML = "";
+    MOODS.forEach((m) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = m;
+      if (m === selectedMood) btn.classList.add("selected");
+      btn.onclick = () => {
+        selectedMood = m;
+        document.getElementById("entryMood").value = m;
+        wrap.querySelectorAll("button").forEach((b) => b.classList.toggle("selected", b.textContent === m));
+      };
+      wrap.appendChild(btn);
+    });
+    document.getElementById("entryMood").value = selectedMood;
+  }
+
+  function buildMoodFilter() {
+    const sel = document.getElementById("moodFilter");
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">全部</option>';
+    MOODS.forEach((m) => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m;
+      sel.appendChild(opt);
+    });
+    sel.value = cur || "";
+  }
+
+  function showTab(name) {
+    if (readonlyMode && name === "write") {
+      alert("只读分享页不能写新记录。请点「回到可编辑首页」或打开公网正式链接。");
+      return;
+    }
+    document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+    document.querySelectorAll("#tabs button").forEach((b) => b.classList.remove("active"));
+    const panel = document.getElementById("panel-" + name);
+    if (panel) panel.classList.add("active");
+    const btn = document.querySelector('#tabs button[data-tab="' + name + '"]');
+    if (btn) btn.classList.add("active");
+    if (name === "list") renderList();
+    if (name === "share") renderShareSelect();
+  }
+
+  function resetWriteForm() {
+    selectedMood = "平静";
+    document.getElementById("entryMood").value = "平静";
+    document.getElementById("entryTitle").value = "";
+    document.getElementById("entryBody").value = "";
+    document.getElementById("entryDate").value = todayStr();
+    buildMoodChips();
+  }
+
+  function saveEntry() {
+    if (readonlyMode) return;
+    const body = document.getElementById("entryBody").value.trim();
+    if (!body) {
+      alert("请先写一点心里话");
+      return;
+    }
+    const entry = {
+      id: uid(),
+      mood: document.getElementById("entryMood").value || "其他",
+      title: document.getElementById("entryTitle").value.trim(),
+      body: body,
+      date: document.getElementById("entryDate").value || todayStr()
+    };
+    state.entries.push(entry);
+    saveState();
+    resetWriteForm();
+    renderList();
+    renderShareSelect();
+    showTab("list");
+  }
+
+  function deleteEntry(id) {
+    if (readonlyMode) return;
+    if (!confirm("确定删除这条记录？")) return;
+    state.entries = state.entries.filter((e) => e.id !== id);
+    saveState();
+    renderList();
+    renderShareSelect();
+  }
+
+  function toggleBody(id) {
+    const el = document.getElementById("body-" + id);
+    if (!el) return;
+    el.classList.toggle("open");
+    const btn = document.getElementById("tog-" + id);
+    if (btn) btn.textContent = el.classList.contains("open") ? "收起" : "展开";
+  }
+
+  function renderList() {
+    const filter = document.getElementById("moodFilter").value;
+    let items = state.entries.slice();
+    if (filter) items = items.filter((e) => e.mood === filter);
+    items.sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.id).localeCompare(String(a.id)));
+
+    document.getElementById("statCount").textContent = String(state.entries.length);
+    document.getElementById("statFilter").textContent = filter || "全部";
+
+    const list = document.getElementById("entryList");
+    const empty = document.getElementById("emptyHint");
+    list.innerHTML = "";
+    if (!items.length) {
+      empty.style.display = "block";
+      return;
+    }
+    empty.style.display = "none";
+    items.forEach((e) => {
+      const li = document.createElement("li");
+      const head = document.createElement("div");
+      head.className = "head";
+      const left = document.createElement("div");
+      left.innerHTML = '<span class="mood-tag"></span><span class="title"></span>';
+      left.querySelector(".mood-tag").textContent = e.mood;
+      left.querySelector(".title").textContent = e.title || "（无标题）";
+      const date = document.createElement("div");
+      date.className = "date";
+      date.textContent = e.date;
+      head.appendChild(left);
+      head.appendChild(date);
+
+      const body = document.createElement("div");
+      body.className = "body";
+      body.id = "body-" + e.id;
+      body.textContent = e.body;
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      const tog = document.createElement("button");
+      tog.type = "button";
+      tog.className = "btn btn-sm btn-outline";
+      tog.id = "tog-" + e.id;
+      tog.textContent = "展开";
+      tog.onclick = () => toggleBody(e.id);
+      actions.appendChild(tog);
+      if (!readonlyMode) {
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "btn btn-sm btn-danger";
+        del.textContent = "删除";
+        del.onclick = () => deleteEntry(e.id);
+        actions.appendChild(del);
+      }
+
+      li.appendChild(head);
+      li.appendChild(body);
+      li.appendChild(actions);
+      list.appendChild(li);
+    });
+
+    document.getElementById("readonlyBanner").style.display = readonlyMode ? "block" : "none";
+    document.querySelectorAll("#tabs button").forEach((btn) => {
+      const t = btn.getAttribute("data-tab");
+      if (readonlyMode && t === "write") {
+        btn.disabled = true;
+        btn.style.opacity = "0.45";
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = "";
+      }
+    });
+  }
+
+  function renderShareSelect() {
+    const wrap = document.getElementById("shareSelectList");
+    wrap.innerHTML = "";
+    const sorted = state.entries.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    if (!sorted.length) {
+      wrap.innerHTML = '<p class="hint">暂无记录可分享。</p>';
+      return;
+    }
+    sorted.forEach((e) => {
+      const row = document.createElement("label");
+      row.className = "entry-check";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.value = e.id;
+      cb.className = "share-cb";
+      cb.checked = true;
+      const info = document.createElement("div");
+      info.innerHTML = '<span class="mood-tag"></span><strong></strong> <span class="date"></span><div class="hint" style="margin:4px 0 0;"></div>';
+      info.querySelector(".mood-tag").textContent = e.mood;
+      info.querySelector("strong").textContent = e.title || "（无标题）";
+      info.querySelector(".date").textContent = e.date;
+      const preview = (e.body || "").slice(0, 48);
+      info.querySelector(".hint").textContent = preview + ((e.body || "").length > 48 ? "…" : "");
+      row.appendChild(cb);
+      row.appendChild(info);
+      wrap.appendChild(row);
+    });
+  }
+
+  function selectAllShare(on) {
+    document.querySelectorAll(".share-cb").forEach((cb) => { cb.checked = !!on; });
+  }
+
+  function loadDemo() {
+    if (readonlyMode) return;
+    if (!confirm("载入示范记录会覆盖当前本机数据，确定？")) return;
+    state = { entries: BUILTIN.entries.map((e) => Object.assign({}, e)) };
+    saveState();
+    renderList();
+    renderShareSelect();
+    showTab("list");
+  }
+
+  function payload() {
+    return { entries: state.entries };
+  }
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(payload(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "情绪树洞备份.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  async function copyBackupText() {
+    const text = JSON.stringify(payload(), null, 2);
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("本机备份文本已复制。可粘贴到备忘录 / 网盘。");
+    } catch (err) {
+      prompt("请手动复制：", text);
+    }
+  }
+
+  function applyData(o, persist) {
+    state = {
+      entries: Array.isArray(o.entries) ? o.entries.map(normalizeEntry).filter(Boolean) : []
+    };
+    if (persist && !readonlyMode) saveState();
+    renderList();
+    renderShareSelect();
+  }
+
+  function importPaste() {
+    if (readonlyMode) {
+      alert("只读模式请先回到可编辑首页");
+      return;
+    }
+    const t = document.getElementById("pasteBox").value.trim();
+    if (!t) {
+      alert("请先粘贴 JSON");
+      return;
+    }
+    try {
+      const o = JSON.parse(t);
+      applyData(o, true);
+      document.getElementById("pasteBox").value = "";
+      showTab("list");
+      alert("导入成功");
+    } catch (err) {
+      alert("JSON 格式不对：" + err.message);
+    }
+  }
+
+  document.getElementById("importFile").addEventListener("change", (ev) => {
+    if (readonlyMode) return;
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const o = JSON.parse(String(reader.result || ""));
+        applyData(o, true);
+        showTab("list");
+        alert("导入成功");
+      } catch (err) {
+        alert("导入失败：" + err.message);
+      }
+      ev.target.value = "";
+    };
+    reader.readAsText(f, "utf-8");
+  });
+
+  function encodePayload(obj) {
+    const json = JSON.stringify(obj);
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    bytes.forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+
+  function decodePayload(hashBody) {
+    let b64 = hashBody.replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+
+  function getShareOrigin() {
+    const box = document.getElementById("shareBase");
+    const custom = (box && box.value || "").trim().replace(/\/+$/, "");
+    if (custom) return custom;
+    return location.origin + location.pathname.replace(/\/index\.html$/i, "/").replace(/\/?$/, "/");
+  }
+
+  function selectedEntriesForShare() {
+    const ids = new Set();
+    document.querySelectorAll(".share-cb:checked").forEach((cb) => ids.add(cb.value));
+    return state.entries.filter((e) => ids.has(e.id));
+  }
+
+  async function copyShareLink() {
+    const picked = selectedEntriesForShare();
+    if (!picked.length) {
+      alert("请至少勾选一条要分享的记录");
+      return;
+    }
+    if (picked.length > 30) {
+      if (!confirm("当前超过 30 条，分享链接可能很长甚至被聊天软件截断。仍要复制？")) return;
+    }
+    if (isLocalHost() && !document.getElementById("shareBase").value.trim()) {
+      if (!confirm("当前是本机地址，同学打不开。建议先填「分享基址」或到公网页面再复制。仍要复制本机链接？")) return;
+    }
+    const origin = getShareOrigin();
+    const hash = "#e=" + encodePayload({ entries: picked });
+    const url = origin.replace(/\/?$/, "/") + hash;
+    try {
+      await navigator.clipboard.writeText(url);
+      alert("分享链接已复制！\n对方打开可看只读树洞（含 #e=）。\n请确认不是 127.0.0.1。");
+    } catch (err) {
+      prompt("请手动复制：", url);
+    }
+  }
+
+  async function copyEmptyTemplate() {
+    const origin = getShareOrigin();
+    const url = origin.replace(/\/?$/, "/");
+    const tip =
+      "情绪树洞空模板（请打开后自己写记录）：\n" +
+      url +
+      "\n\n说明：这是工具首页，不是带数据的 #e= 链接。";
+    try {
+      await navigator.clipboard.writeText(tip);
+      alert("空模板说明已复制");
+    } catch (err) {
+      prompt("请手动复制：", tip);
+    }
+  }
+
+  function exitReadonly() {
+    readonlyMode = false;
+    history.replaceState(null, "", location.pathname + location.search);
+    const local = loadState();
+    state = local || { entries: BUILTIN.entries.map((e) => Object.assign({}, e)) };
+    if (!local) saveState();
+    renderList();
+    renderShareSelect();
+    showTab("list");
+  }
+
+  function bootFromHash() {
+    const h = location.hash || "";
+    if (h.startsWith("#e=")) {
+      try {
+        const o = decodePayload(h.slice(3));
+        readonlyMode = true;
+        applyData(o, false);
+        showTab("list");
+        return true;
+      } catch (err) {
+        console.warn("hash decode failed", err);
+        alert("分享链接解析失败，已打开本机记录。");
+      }
+    }
+    return false;
+  }
+
+  function boot() {
+    updateLocalhostWarn();
+    buildMoodChips();
+    buildMoodFilter();
+    document.getElementById("entryDate").value = todayStr();
+    try {
+      const sb = sessionStorage.getItem("t5_share_base");
+      if (sb) document.getElementById("shareBase").value = sb;
+    } catch (err) {}
+    document.getElementById("shareBase").addEventListener("change", () => {
+      try {
+        sessionStorage.setItem("t5_share_base", document.getElementById("shareBase").value.trim());
+      } catch (err) {}
+    });
+
+    if (!bootFromHash()) {
+      const local = loadState();
+      if (local) {
+        state = local;
+      } else {
+        state = { entries: BUILTIN.entries.map((e) => Object.assign({}, e)) };
+        saveState();
+      }
+      renderList();
+      renderShareSelect();
+    }
+  }
+
+  boot();
+  </script>
+</body>
+</html>

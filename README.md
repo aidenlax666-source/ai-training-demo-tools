@@ -8,6 +8,7 @@
 | [T2-格式转换](./T2-格式转换/) | CSV↔Excel / 编码 / 重命名（不调大模型） | 本地脚本，见目录 README |
 | [T3-知识卡片](./T3-知识卡片/) | 翻转知识卡片，可分享卡组 | https://pastel-oasis-an83.here.now/ |
 | [T4-简单记账](./T4-简单记账/) | 预算 vs 已花，可只读分享 | https://royal-echo-e5yf.here.now/ |
+| [T5-情绪树洞](./T5-情绪树洞/) | 把心里话写下来，可只读分享 | https://plush-sandal-b8v4.here.now/ |
 
 ## 快速开始
 见各子目录 `README.md`。T2：`cd T2-格式转换 && bash run_demo.sh`（精讲用 `run_scene_a/b/c`）。
