@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
-  <title>学习闯关清单 · 7 天 AI 上手</title>
+  <title>学习闯关清单 · AI 上手五关</title>
   <style>
     :root {
       /* 【改这里①】主题色 */
@@ -168,7 +168,8 @@
 
     <section id="panel-home" class="panel active">
       <div class="card-box">
-        <div class="deck-title" id="planTitle" style="font-size:1.15rem;font-weight:700;margin-bottom:10px;">清单</div>
+        <div class="deck-title" id="planTitle" style="font-size:1.15rem;font-weight:700;margin-bottom:4px;">清单</div>
+        <div class="hint" id="planSubtitle" style="margin:0 0 12px;"></div>
         <div class="stats">
           <div class="stat">
             <div class="label">已完成任务</div>
@@ -249,18 +250,21 @@
         <input type="url" id="shareBase" placeholder="https://你的公网地址/" />
         <div class="row">
           <button type="button" class="btn btn-ok" onclick="copyShareLink()">复制分享链接</button>
+          <button type="button" class="btn btn-outline" onclick="copyShareLinkSlim()">复制精简分享（前 4 关）</button>
           <button type="button" class="btn btn-ghost" onclick="copyBackupText()">复制本机备份文本</button>
         </div>
+        <p class="hint">链接总长以字符为准：关卡 ≤6 仍可能因任务文案长而超长。超过约 2000 字符会警告；课堂丢群建议优先「精简前 4 关」或「导出 JSON」。</p>
       </div>
     </section>
 
-    <footer class="tiny">零依赖单文件 · 进度 localStorage · 分享 #q= 清单结构</footer>
+    <footer class="tiny">零依赖单文件 · 进度 localStorage · 分享 #q= 清单结构<br />面向成年学员；不适合高中生及以下单独使用。</footer>
   </div>
 
 <script>
 /* 【改这里②】内置示范清单（与 quests.json 一致，file:// 也能用） */
 const BUILTIN = {
-  title: "7 天 AI 上手闯关",
+  title: "AI 上手 · 五关清单",
+  subtitle: "建议 7 天完成 · 共 5 关",
   quests: [
     {
       id: "q1", name: "第 1 关 · 认识 AI", desc: "知道 AI 能帮你做什么、不能做什么",
@@ -313,7 +317,7 @@ const PROGRESS_KEY = "t6_quest_progress_v1";
 const SEQ_KEY = "t6_quest_seq_v1";
 const OPEN_KEY = "t6_quest_open_v1";
 
-let state = { title: "", quests: [] };
+let state = { title: "", subtitle: "", quests: [] };
 let progress = {}; // taskId -> true
 let openMap = {};  // questId -> true
 let lastCeleb = "";
@@ -367,6 +371,7 @@ function saveOpenMap() {
 function persistPlan() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     title: state.title,
+    subtitle: state.subtitle || "",
     quests: state.quests
   }));
 }
@@ -377,11 +382,13 @@ function loadState() {
     if (raw) {
       const data = JSON.parse(raw);
       state.title = data.title || "我的闯关清单";
+      state.subtitle = data.subtitle || "";
       state.quests = normalizeQuests(data.quests);
       return;
     }
   } catch (e) {}
   state.title = BUILTIN.title;
+  state.subtitle = BUILTIN.subtitle || "";
   state.quests = normalizeQuests(BUILTIN.quests);
   persistPlan();
 }
@@ -489,15 +496,7 @@ function joinBaseAndHash(base, hash) {
   return url + hash;
 }
 
-function copyShareLink() {
-  if (!state.quests.length) {
-    alert("还没有关卡，先加几关再分享。");
-    return;
-  }
-  if (state.quests.length > 6) {
-    if (!confirm("当前有 " + state.quests.length + " 关，分享链接会很长，可能被微信等截断。建议 ≤6 关。仍要复制？")) return;
-  }
-  const hash = "#q=" + encodePlan({ title: state.title, quests: state.quests });
+function resolveShareBase() {
   let base = getShareBase();
   if (!base) {
     if (isLocalHost()) {
@@ -505,7 +504,7 @@ function copyShareLink() {
         "当前是本机地址，同学打不开。请粘贴公网基址（见 公网链接.txt）：",
         "https://请填入发布后的公网地址/"
       );
-      if (!tip) return;
+      if (!tip) return null;
       base = tip.trim();
       const box = document.getElementById("shareBase");
       if (box) box.value = base;
@@ -513,13 +512,63 @@ function copyShareLink() {
       base = location.href.split("#")[0];
     }
   }
-  const url = joinBaseAndHash(base, hash);
+  return base;
+}
+
+function buildShareUrl(plan) {
+  const hash = "#q=" + encodePlan({ title: plan.title, quests: plan.quests });
+  const base = resolveShareBase();
+  if (!base) return null;
+  return joinBaseAndHash(base, hash);
+}
+
+function warnIfUrlTooLong(url) {
+  if (!url || url.length <= 2000) return true;
+  const msg =
+    "分享链接约 " + url.length + " 字符，已超过 2000。\n\n" +
+    "聊天软件（微信等）可能截断链接。\n" +
+    "自检：用无痕/无痕窗口打开后，若关卡不全 = 链接被截断。\n\n" +
+    "建议：删减关卡，或改用「导出 JSON」；课堂丢群可点「复制精简分享（前 4 关）」。\n\n" +
+    "仍要复制这条完整链接？";
+  return confirm(msg);
+}
+
+function copyShareLink(slim) {
+  if (!state.quests.length) {
+    alert("还没有关卡，先加几关再分享。");
+    return;
+  }
+  let plan = { title: state.title, quests: state.quests };
+  if (slim) {
+    const n = Math.min(4, state.quests.length);
+    plan = {
+      title: (state.title || "闯关清单") + "（精简前" + n + "关）",
+      quests: state.quests.slice(0, n)
+    };
+  } else if (state.quests.length > 6) {
+    if (!confirm("当前有 " + state.quests.length + " 关，分享链接会很长，可能被微信等截断。建议 ≤6 关。仍要复制？")) return;
+  }
+  const url = buildShareUrl(plan);
   if (!url) { alert("缺少分享基址"); return; }
+  if (!warnIfUrlTooLong(url)) return;
   navigator.clipboard.writeText(url).then(() => {
-    alert("分享链接已复制！\n同学打开即可看到同一套关卡。\n（链接含 #q= 清单结构；勾选进度在各自本机）");
+    alert("分享链接已复制！\n长度约 " + url.length + " 字符。\n同学打开即可看到同一套关卡。\n（链接含 #q= 清单结构；勾选进度在各自本机）");
   }).catch(() => {
-    prompt("请手动复制：", url);
+    prompt("请手动复制（约 " + url.length + " 字符）：", url);
   });
+}
+
+function copyShareLinkSlim() {
+  if (!state.quests.length) {
+    alert("还没有关卡，先加几关再分享。");
+    return;
+  }
+  if (state.quests.length <= 4) {
+    copyShareLink(false);
+    return;
+  }
+  if (!confirm("将只分享前 4 关（共 " + state.quests.length + " 关），链接更短、更不易被截断。继续？")) return;
+  copyShareLink(true);
 }
 
 function copyBackupText() {
@@ -578,6 +627,7 @@ function triggerImport() {
 
 function applyPlan(plan, notice, clearProg) {
   state.title = plan.title || "我的闯关清单";
+  state.subtitle = plan.subtitle || "";
   state.quests = normalizeQuests(plan.quests);
   if (clearProg) {
     progress = {};
@@ -604,7 +654,7 @@ function importFromPaste() {
 }
 
 function loadBuiltin() {
-  applyPlan(BUILTIN, "已载入示范清单「7 天 AI 上手闯关」。", true);
+  applyPlan(BUILTIN, "已载入示范清单「AI 上手 · 五关清单」（建议 7 天完成 · 共 5 关）。", true);
 }
 
 async function tryLoadQuestsJson() {
@@ -666,6 +716,12 @@ function toggleQuestOpen(qid) {
 
 function renderHome() {
   document.getElementById("planTitle").textContent = state.title || "闯关清单";
+  const sub = document.getElementById("planSubtitle");
+  if (sub) {
+    const text = state.subtitle || (state.quests.length ? ("共 " + state.quests.length + " 关") : "");
+    sub.textContent = text;
+    sub.style.display = text ? "block" : "none";
+  }
   const st = overallStats();
   document.getElementById("statDone").textContent = String(st.done);
   document.getElementById("statTotal").textContent = String(st.total);
