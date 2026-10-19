@@ -1,10 +1,10 @@
 {
   "publishes": {
-    "plush-sandal-b8v4": {
-      "siteUrl": "https://plush-sandal-b8v4.here.now/",
-      "claimToken": "krtBQrybL9fepLSV",
-      "claimUrl": "https://here.now/c/krtBQrybL9fepLSV",
-      "expiresAt": "2026-10-18T12:29:24.051Z"
+    "frosty-zephyr-x6g7": {
+      "siteUrl": "https://frosty-zephyr-x6g7.here.now/",
+      "claimToken": "vJ76iCVLsA437Mbn",
+      "claimUrl": "https://here.now/c/vJ76iCVLsA437Mbn",
+      "expiresAt": "2026-10-19T23:59:00+08:00"
     }
   }
 }
