@@ -1,6 +1,6 @@
-siteUrl=https://pastel-oasis-an83.here.now/
-slug=pastel-oasis-an83
+siteUrl=https://fancy-acorn-zkw2.here.now/
+slug=fancy-acorn-zkw2
 auth_mode=anonymous
-expires_at=约北京时间 2026-10-18 20:22（匿名约 24 小时；以认领页为准）
-claimUrl=https://here.now/c/8JXCmuS6jNFcfnI6
-说明=匿名站点约 24 小时过期；打开 claimUrl 认领后可永久保存。分享优先用公网地址，勿发 127.0.0.1。卡组建议 ≤30 张。
+expires_at=约北京时间 2026-10-20 07:48（匿名约 24 小时；以认领页为准）
+claimUrl=https://here.now/c/9UY3LxHhqj4J81-w
+说明=2026-10-19 因匿名站过期已重新发布。打开 claimUrl 认领后可永久保存。分享优先用公网地址，勿发 127.0.0.1。卡组建议 ≤30 张。
