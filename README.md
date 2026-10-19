@@ -1,18 +1,22 @@
-# AI 培训示范工具
+# AI 培训示范工具（v3.2）
 
 面向 **0 基础成年人实战培训** 的可运行示范：小而专、给自己/家人/少数人用。
 
+课程嵌入见 [`网页型总说明.md`](./网页型总说明.md)（模块 8/9 菜单与纪律）。链接口径见 [`00-链接与认领速查.md`](./00-链接与认领速查.md)。
+
 | 目录 | 说明 | 公网演示（匿名有有效期，见各目录说明） |
 |------|------|------|
-| [T1-答题闯关](./T1-答题闯关/) | 答题闯关 + 知识库·AI 出题 | https://lively-mirage-sh6f.here.now/ |
+| [T1-答题闯关](./T1-答题闯关/) | 答题闯关 + 知识库·AI 出题 | https://zippy-scroll-ac8c.here.now/ |
 | [T2-格式转换](./T2-格式转换/) | CSV↔Excel / 编码 / 重命名（不调大模型） | 本地脚本，见目录 README |
-| [T3-知识卡片](./T3-知识卡片/) | 翻转知识卡片，可分享卡组 | https://pastel-oasis-an83.here.now/ |
-| [T4-简单记账](./T4-简单记账/) | 预算 vs 已花，可只读分享 | https://royal-echo-e5yf.here.now/ |
-| [T5-情绪树洞](./T5-情绪树洞/) | 把心里话写下来，可只读分享 | https://plush-sandal-b8v4.here.now/ |
-| [T6-学习闯关清单](./T6-学习闯关清单/) | 关卡清单 + 勾选进度，可分享清单 | https://silver-orbit-5rcs.here.now/ |
+| [T3-知识卡片](./T3-知识卡片/) | 翻转知识卡片，可分享卡组 | https://fancy-acorn-zkw2.here.now/ |
+| [T4-简单记账](./T4-简单记账/) | 预算 vs 已花，可只读分享 | https://subtle-crest-mmf5.here.now/ |
+| [T5-情绪树洞](./T5-情绪树洞/) | 把心里话写下来，可只读分享 | https://frosty-zephyr-x6g7.here.now/ |
+| [T6-学习闯关清单](./T6-学习闯关清单/) | 关卡清单 + 勾选进度，可分享清单 | https://subtle-quartz-28bx.here.now/ |
 
 ## 快速开始
 见各子目录 `README.md`。T2：`cd T2-格式转换 && bash run_demo.sh`（精讲用 `run_scene_a/b/c`）。
 
 ## 定位
 课程示范用途；非高并发上线产品。
+
+认领永久站（约 24h 内）：见项目包 `ai-training-project/00-链接与认领速查.md`。
