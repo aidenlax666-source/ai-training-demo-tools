@@ -1,0 +1,22 @@
+{
+  "publishes": {
+    "fancy-acorn-zkw2": {
+      "siteUrl": "https://fancy-acorn-zkw2.here.now/",
+      "claimToken": "9UY3LxHhqj4J81-w",
+      "claimUrl": "https://here.now/c/9UY3LxHhqj4J81-w",
+      "expiresAt": "2026-10-20T23:44:12.000Z"
+    },
+    "tawny-incense-smn4": {
+      "siteUrl": "https://tawny-incense-smn4.here.now/",
+      "claimToken": "-5ZlLOkooNYGXkjy",
+      "claimUrl": "https://here.now/c/-5ZlLOkooNYGXkjy",
+      "expiresAt": "2026-10-21T03:24:44.503Z"
+    },
+    "happy-oyster-v9he": {
+      "siteUrl": "https://happy-oyster-v9he.here.now/",
+      "claimToken": "IZQclyLUM18GKjJx",
+      "claimUrl": "https://here.now/c/IZQclyLUM18GKjJx",
+      "expiresAt": "2026-10-21T23:51:53.000Z"
+    }
+  }
+}

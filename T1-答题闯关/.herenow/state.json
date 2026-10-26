@@ -2,6 +2,12 @@
   "publishes": {
     "lively-mirage-sh6f": {
       "siteUrl": "https://lively-mirage-sh6f.here.now/"
+    },
+    "serene-pepper-2ny8": {
+      "siteUrl": "https://serene-pepper-2ny8.here.now/",
+      "claimToken": "ED0Uf5PYR1uAD0c1",
+      "claimUrl": "https://here.now/c/ED0Uf5PYR1uAD0c1",
+      "expiresAt": "2026-10-21T23:51:53.000Z"
     }
   }
 }
