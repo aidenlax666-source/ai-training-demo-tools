@@ -1,6 +1,3 @@
-siteUrl=https://subtle-crest-mmf5.here.now/
-slug=subtle-crest-mmf5
-auth_mode=anonymous
-expires_at=约北京时间 2026-10-20 07:59（匿名约 24 小时；以认领页为准）
-claimUrl=https://here.now/c/bQUO_Magq1zydZVV
-说明=以项目包 00-链接与认领速查.md 为准（2026-10-19 重发）。打开 claimUrl 认领后可永久保存。分享优先用公网地址，勿发 127.0.0.1。笔数建议 ≤40。#b= 为只读总览。
+演示：https://glacial-violet-k6ck.here.now/
+认领：https://here.now/c/eA6ZxgNGHvp5c-s4
+约到期（北京时间）：约 2026-10-27 18:08

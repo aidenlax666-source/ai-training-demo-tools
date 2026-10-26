@@ -4,7 +4,19 @@
       "siteUrl": "https://frosty-zephyr-x6g7.here.now/",
       "claimToken": "vJ76iCVLsA437Mbn",
       "claimUrl": "https://here.now/c/vJ76iCVLsA437Mbn",
-      "expiresAt": "2026-10-19T23:59:00+08:00"
+      "expiresAt": "2026-10-20T23:44:12.000Z"
+    },
+    "eternal-atlas-6znj": {
+      "siteUrl": "https://eternal-atlas-6znj.here.now/",
+      "claimToken": "UGo7zK843az4WiNZ",
+      "claimUrl": "https://here.now/c/UGo7zK843az4WiNZ",
+      "expiresAt": "2026-10-21T23:51:53.000Z"
+    },
+    "quartz-yoga-tcw4": {
+      "siteUrl": "https://quartz-yoga-tcw4.here.now/",
+      "claimToken": "c1EsC_pifh35n8O6",
+      "claimUrl": "https://here.now/c/c1EsC_pifh35n8O6",
+      "expiresAt": "2026-10-27T10:08:24.748Z"
     }
   }
 }
