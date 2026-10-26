@@ -6,12 +6,12 @@
 
 | 目录 | 说明 | 公网演示（匿名有有效期，见各目录说明） |
 |------|------|------|
-| [T1-答题闯关](./T1-答题闯关/) | 答题闯关 + 知识库·AI 出题 | https://zippy-scroll-ac8c.here.now/ |
+| [T1-答题闯关](./T1-答题闯关/) | 答题闯关 + 知识库·AI 出题 | https://pearly-sparrow-fes8.here.now/ |
 | [T2-格式转换](./T2-格式转换/) | CSV↔Excel / 编码 / 重命名（不调大模型） | 本地脚本，见目录 README |
-| [T3-知识卡片](./T3-知识卡片/) | 翻转知识卡片，可分享卡组 | https://fancy-acorn-zkw2.here.now/ |
-| [T4-简单记账](./T4-简单记账/) | 预算 vs 已花，可只读分享 | https://subtle-crest-mmf5.here.now/ |
-| [T5-情绪树洞](./T5-情绪树洞/) | 把心里话写下来，可只读分享 | https://frosty-zephyr-x6g7.here.now/ |
-| [T6-学习闯关清单](./T6-学习闯关清单/) | 关卡清单 + 勾选进度，可分享清单 | https://subtle-quartz-28bx.here.now/ |
+| [T3-知识卡片](./T3-知识卡片/) | 翻转知识卡片，可分享卡组 | https://gilded-echo-mpd9.here.now/ |
+| [T4-简单记账](./T4-简单记账/) | 预算 vs 已花，可只读分享 | https://unbound-serenity-ep8c.here.now/ |
+| [T5-情绪树洞](./T5-情绪树洞/) | 把心里话写下来，可只读分享 | https://flowing-kernel-rr64.here.now/ |
+| [T6-学习闯关清单](./T6-学习闯关清单/) | 关卡清单 + 勾选进度，可分享清单 | https://lusty-rocket-52yn.here.now/ |
 
 ## 快速开始
 见各子目录 `README.md`。T2：`cd T2-格式转换 && bash run_demo.sh`（精讲用 `run_scene_a/b/c`）。
