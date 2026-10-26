@@ -1,3 +1,6 @@
-演示：https://queued-quartz-c2fs.here.now/
-认领：https://here.now/c/Uw_vV1mUsntJn1UL
-约到期（北京时间）：约 2026-10-26 08:25
+siteUrl=https://lusty-rocket-52yn.here.now/
+slug=lusty-rocket-52yn
+auth_mode=anonymous
+expires_at=约北京时间 2026-10-27 18:08（匿名约 24 小时；以认领页为准）
+claimUrl=https://here.now/c/AKd4mBPhUoBHy2em
+说明=2026-10-26 因短链 404 已重新发布。打开 claimUrl 认领后可永久保存。分享优先用公网地址，勿发 127.0.0.1。
