@@ -17,6 +17,18 @@
       "claimToken": "IZQclyLUM18GKjJx",
       "claimUrl": "https://here.now/c/IZQclyLUM18GKjJx",
       "expiresAt": "2026-10-21T23:51:53.000Z"
+    },
+    "dusty-serenity-p7hp": {
+      "siteUrl": "https://dusty-serenity-p7hp.here.now/",
+      "claimToken": "cfks5TBOUGzeGr-D",
+      "claimUrl": "https://here.now/c/cfks5TBOUGzeGr-D",
+      "expiresAt": "2026-10-27T10:07:59.928Z"
+    },
+    "karma-castle-m5hj": {
+      "siteUrl": "https://karma-castle-m5hj.here.now/",
+      "claimToken": "MNAD4cYH-21kAOws",
+      "claimUrl": "https://here.now/c/MNAD4cYH-21kAOws",
+      "expiresAt": "2026-11-06T00:18:00.000Z"
     }
   }
 }

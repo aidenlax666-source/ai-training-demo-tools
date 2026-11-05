@@ -1,3 +1,6 @@
-演示：https://wistful-breath-ggw5.here.now/
-认领：https://here.now/c/1rAOWMay1id3C2OW
-约到期（北京时间）：约 2026-10-27 18:07
+演示：https://silver-badge-69rz.here.now/
+认领：https://here.now/c/DBGlyRN9NXhb-deY
+slug=silver-badge-69rz
+expiresAt=2026-11-06T03:27:47.581Z
+claimToken=DBGlyRN9NXhb-deY
+说明=2026-11-05 11:28 旧短链已 404，已重新匿名发布约 24h。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。

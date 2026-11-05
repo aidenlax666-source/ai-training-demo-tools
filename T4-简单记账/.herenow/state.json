@@ -17,6 +17,12 @@
       "claimToken": "eA6ZxgNGHvp5c-s4",
       "claimUrl": "https://here.now/c/eA6ZxgNGHvp5c-s4",
       "expiresAt": "2026-10-27T10:08:23.442Z"
+    },
+    "subtle-pebble-9q95": {
+      "siteUrl": "https://subtle-pebble-9q95.here.now/",
+      "claimToken": "vMPRJHF3-D7Mg5B_",
+      "claimUrl": "https://here.now/c/vMPRJHF3-D7Mg5B_",
+      "expiresAt": "2026-11-06T00:18:00.000Z"
     }
   }
 }

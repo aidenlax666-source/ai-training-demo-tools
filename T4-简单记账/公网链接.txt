@@ -1,3 +1,6 @@
-演示：https://glacial-violet-k6ck.here.now/
-认领：https://here.now/c/eA6ZxgNGHvp5c-s4
-约到期（北京时间）：约 2026-10-27 18:08
+演示：https://autumn-silence-2y87.here.now/
+认领：https://here.now/c/Bt7tXhjkoSR_8ghK
+slug=autumn-silence-2y87
+expiresAt=2026-11-06T03:28:11.718Z
+claimToken=Bt7tXhjkoSR_8ghK
+说明=2026-11-05 11:28 旧短链已 404，已重新匿名发布约 24h。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
