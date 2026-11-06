@@ -1,11 +1,11 @@
 {
   "publishes": {
-    "zingy-gorge-7phb": {
-      "siteUrl": "https://zingy-gorge-7phb.here.now/",
-      "claimToken": "aeIzsV3rlRVbtKAX",
-      "claimUrl": "https://here.now/c/aeIzsV3rlRVbtKAX",
-      "expiresAt": "2026-11-07T00:13:30Z",
-      "renewedAt": "2026-11-06T00:13:30Z"
+    "queued-bodhi-tx3x": {
+      "siteUrl": "https://queued-bodhi-tx3x.here.now/",
+      "claimToken": "vzh_BiNhihmKS_A0",
+      "claimUrl": "https://here.now/c/vzh_BiNhihmKS_A0",
+      "expiresAt": "2026-11-07T07:07:25.200Z",
+      "renewedAt": "2026-11-06T07:07:00Z"
     }
   }
 }

@@ -1,6 +1,6 @@
-演示：https://autumn-silence-2y87.here.now/
-认领：https://here.now/c/Bt7tXhjkoSR_8ghK
-slug=autumn-silence-2y87
-expiresAt=2026-11-07T00:13:30Z
-claimToken=Bt7tXhjkoSR_8ghK
-说明=2026-11-06 08:14 晨间同 slug 匿名 PUT 续约，约再续 24h（Asia/Shanghai 约 2026-11-07 08:14）。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
+演示：https://sturdy-canvas-e6wb.here.now/
+认领：https://here.now/c/3Zp2C42wZwPBbSaW
+slug=sturdy-canvas-e6wb
+expiresAt=2026-11-07T07:07:12.368Z
+claimToken=3Zp2C42wZwPBbSaW
+说明=2026-11-06 15:07 下午发现晨间续约后短链已 404（旧认领链失效），已新建匿名站；约到期 Asia/Shanghai 2026-11-07 15:07。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。

@@ -12,3 +12,4 @@ samples/output/**
 *.local.json
 .env
 .env.*
+.herenow/

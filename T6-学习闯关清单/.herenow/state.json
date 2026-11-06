@@ -1,11 +1,11 @@
 {
   "publishes": {
-    "marine-bodhi-7tgn": {
-      "siteUrl": "https://marine-bodhi-7tgn.here.now/",
-      "claimToken": "GHXj7Eb3ZoPh7VBL",
-      "claimUrl": "https://here.now/c/GHXj7Eb3ZoPh7VBL",
-      "expiresAt": "2026-11-07T00:13:30Z",
-      "renewedAt": "2026-11-06T00:13:30Z"
+    "saffron-sphinx-9vf7": {
+      "siteUrl": "https://saffron-sphinx-9vf7.here.now/",
+      "claimToken": "DOOwF62ogb8lCoLt",
+      "claimUrl": "https://here.now/c/DOOwF62ogb8lCoLt",
+      "expiresAt": "2026-11-07T07:07:37.395Z",
+      "renewedAt": "2026-11-06T07:07:00Z"
     }
   }
 }

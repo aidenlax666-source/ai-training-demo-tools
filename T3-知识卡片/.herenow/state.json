@@ -1,11 +1,11 @@
 {
   "publishes": {
-    "onyx-willow-7fg5": {
-      "siteUrl": "https://onyx-willow-7fg5.here.now/",
-      "claimToken": "iu-2IR2yqqxp5MVV",
-      "claimUrl": "https://here.now/c/iu-2IR2yqqxp5MVV",
-      "expiresAt": "2026-11-07T00:13:30Z",
-      "renewedAt": "2026-11-06T00:13:30Z"
+    "jovial-tangle-d3py": {
+      "siteUrl": "https://jovial-tangle-d3py.here.now/",
+      "claimToken": "85H7Lq0sjeJpdmyf",
+      "claimUrl": "https://here.now/c/85H7Lq0sjeJpdmyf",
+      "expiresAt": "2026-11-07T07:06:58.349Z",
+      "renewedAt": "2026-11-06T07:07:00Z"
     }
   }
 }

@@ -1,6 +1,6 @@
-siteUrl=https://marine-bodhi-7tgn.here.now/
-slug=marine-bodhi-7tgn
-expiresAt=2026-11-07T00:13:30Z
-claimToken=GHXj7Eb3ZoPh7VBL
-claimUrl=https://here.now/c/GHXj7Eb3ZoPh7VBL
-说明=2026-11-06 08:14 晨间同 slug 匿名 PUT 续约，约再续 24h（Asia/Shanghai 约 2026-11-07 08:14）。打开 claimUrl 认领后可永久保存。分享优先用公网地址，勿发 127.0.0.1。
+siteUrl=https://saffron-sphinx-9vf7.here.now/
+slug=saffron-sphinx-9vf7
+expiresAt=2026-11-07T07:07:37.395Z
+claimToken=DOOwF62ogb8lCoLt
+claimUrl=https://here.now/c/DOOwF62ogb8lCoLt
+说明=2026-11-06 15:07 下午发现晨间续约后短链已 404（旧认领链失效），已新建匿名站；约到期 Asia/Shanghai 2026-11-07 15:07。打开 claimUrl（Google 登录）后可永久保存。分享优先用公网地址，勿发 127.0.0.1。

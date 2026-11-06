@@ -1,11 +1,11 @@
 {
   "publishes": {
-    "silver-badge-69rz": {
-      "siteUrl": "https://silver-badge-69rz.here.now/",
-      "claimToken": "DBGlyRN9NXhb-deY",
-      "claimUrl": "https://here.now/c/DBGlyRN9NXhb-deY",
-      "expiresAt": "2026-11-07T00:13:30Z",
-      "renewedAt": "2026-11-06T00:13:30Z"
+    "stormy-guitar-2sm5": {
+      "siteUrl": "https://stormy-guitar-2sm5.here.now/",
+      "claimToken": "EEnzGzigfhKCyZbU",
+      "claimUrl": "https://here.now/c/EEnzGzigfhKCyZbU",
+      "expiresAt": "2026-11-07T07:06:44.016Z",
+      "renewedAt": "2026-11-06T07:07:00Z"
     }
   }
 }
