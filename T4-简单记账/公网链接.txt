@@ -1,6 +1,6 @@
 演示：https://autumn-silence-2y87.here.now/
 认领：https://here.now/c/Bt7tXhjkoSR_8ghK
 slug=autumn-silence-2y87
-expiresAt=2026-11-06T03:28:11.718Z
+expiresAt=2026-11-07T00:13:30Z
 claimToken=Bt7tXhjkoSR_8ghK
-说明=2026-11-05 11:28 旧短链已 404，已重新匿名发布约 24h。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
+说明=2026-11-06 08:14 晨间同 slug 匿名 PUT 续约，约再续 24h（Asia/Shanghai 约 2026-11-07 08:14）。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。

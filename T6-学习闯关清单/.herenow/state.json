@@ -1,28 +1,11 @@
 {
   "publishes": {
-    "subtle-quartz-28bx": {
-      "siteUrl": "https://subtle-quartz-28bx.here.now/",
-      "claimToken": "u51ZWPCtl2JvgMHP",
-      "claimUrl": "https://here.now/c/u51ZWPCtl2JvgMHP",
-      "expiresAt": "2026-10-20T23:44:12.000Z"
-    },
-    "quartz-heron-bm5b": {
-      "siteUrl": "https://quartz-heron-bm5b.here.now/",
-      "claimToken": "7mPtNNQk1653Ssxj",
-      "claimUrl": "https://here.now/c/7mPtNNQk1653Ssxj",
-      "expiresAt": "2026-10-21T23:51:53.000Z"
-    },
-    "lusty-rocket-52yn": {
-      "siteUrl": "https://lusty-rocket-52yn.here.now/",
-      "claimToken": "AKd4mBPhUoBHy2em",
-      "claimUrl": "https://here.now/c/AKd4mBPhUoBHy2em",
-      "expiresAt": "2026-10-27T10:08:05.647Z"
-    },
-    "civic-essence-p56g": {
-      "siteUrl": "https://civic-essence-p56g.here.now/",
-      "claimToken": "jMOLGRCyUC_p0Dmk",
-      "claimUrl": "https://here.now/c/jMOLGRCyUC_p0Dmk",
-      "expiresAt": "2026-11-06T00:18:00.000Z"
+    "marine-bodhi-7tgn": {
+      "siteUrl": "https://marine-bodhi-7tgn.here.now/",
+      "claimToken": "GHXj7Eb3ZoPh7VBL",
+      "claimUrl": "https://here.now/c/GHXj7Eb3ZoPh7VBL",
+      "expiresAt": "2026-11-07T00:13:30Z",
+      "renewedAt": "2026-11-06T00:13:30Z"
     }
   }
 }
