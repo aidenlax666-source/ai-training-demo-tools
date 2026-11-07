@@ -1,6 +1,6 @@
 演示：https://sturdy-canvas-e6wb.here.now/
 认领：https://here.now/c/3Zp2C42wZwPBbSaW
 slug=sturdy-canvas-e6wb
-expiresAt=2026-11-07T07:07:12.368Z
+expiresAt=2026-11-08T00:07:00Z
 claimToken=3Zp2C42wZwPBbSaW
-说明=2026-11-06 15:07 下午发现晨间续约后短链已 404（旧认领链失效），已新建匿名站；约到期 Asia/Shanghai 2026-11-07 15:07。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
+说明=2026-11-07 08:07 Asia/Shanghai 晨间在短链仍存活时 PUT 续约成功（同 slug）；约到期 Asia/Shanghai 2026-11-08 08:07。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。

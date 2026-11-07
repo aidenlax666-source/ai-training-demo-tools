@@ -1,6 +1,6 @@
-siteUrl=https://saffron-sphinx-9vf7.here.now/
+演示：https://saffron-sphinx-9vf7.here.now/
+认领：https://here.now/c/DOOwF62ogb8lCoLt
 slug=saffron-sphinx-9vf7
-expiresAt=2026-11-07T07:07:37.395Z
+expiresAt=2026-11-08T00:07:00Z
 claimToken=DOOwF62ogb8lCoLt
-claimUrl=https://here.now/c/DOOwF62ogb8lCoLt
-说明=2026-11-06 15:07 下午发现晨间续约后短链已 404（旧认领链失效），已新建匿名站；约到期 Asia/Shanghai 2026-11-07 15:07。打开 claimUrl（Google 登录）后可永久保存。分享优先用公网地址，勿发 127.0.0.1。
+说明=2026-11-07 08:07 Asia/Shanghai 晨间在短链仍存活时 PUT 续约成功（同 slug）；约到期 Asia/Shanghai 2026-11-08 08:07。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
