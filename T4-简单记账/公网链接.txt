@@ -1,6 +1,4 @@
-演示：https://sturdy-canvas-e6wb.here.now/
-认领：https://here.now/c/3Zp2C42wZwPBbSaW
-slug=sturdy-canvas-e6wb
-expiresAt=2026-11-08T00:07:00Z
-claimToken=3Zp2C42wZwPBbSaW
-说明=2026-11-07 08:07 Asia/Shanghai 晨间在短链仍存活时 PUT 续约成功（同 slug）；约到期 Asia/Shanghai 2026-11-08 08:07。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
+短时效演示: https://sturdy-canvas-e6wb.here.now/
+约到期(Asia/Shanghai): 2026-11-08 14:58
+认领永久: https://here.now/c/3Zp2C42wZwPBbSaW
+续约时间: 2026-11-07 ~14:58 Asia/Shanghai

@@ -1,6 +1,4 @@
-演示：https://saffron-sphinx-9vf7.here.now/
-认领：https://here.now/c/DOOwF62ogb8lCoLt
-slug=saffron-sphinx-9vf7
-expiresAt=2026-11-08T00:07:00Z
-claimToken=DOOwF62ogb8lCoLt
-说明=2026-11-07 08:07 Asia/Shanghai 晨间在短链仍存活时 PUT 续约成功（同 slug）；约到期 Asia/Shanghai 2026-11-08 08:07。打开认领链（Google 登录）后可永久保存。勿发 127.0.0.1。
+短时效演示: https://saffron-sphinx-9vf7.here.now/
+约到期(Asia/Shanghai): 2026-11-08 14:58
+认领永久: https://here.now/c/DOOwF62ogb8lCoLt
+续约时间: 2026-11-07 ~14:58 Asia/Shanghai
