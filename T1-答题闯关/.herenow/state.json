@@ -1,11 +1,24 @@
 {
   "publishes": {
-    "stormy-guitar-2sm5": {
-      "siteUrl": "https://stormy-guitar-2sm5.here.now/",
-      "claimToken": "EEnzGzigfhKCyZbU",
-      "claimUrl": "https://here.now/c/EEnzGzigfhKCyZbU",
-      "expiresAt": "2026-11-08T06:58:00Z",
-      "renewedAt": "2026-11-07T06:58:00Z"
+    "wintry-gorge-pt4d": {
+      "siteUrl": "https://wintry-gorge-pt4d.here.now/",
+      "claimToken": "_1UZAwep38uzlxko",
+      "claimUrl": "https://here.now/c/_1UZAwep38uzlxko",
+      "expiresAt": "2026-11-08T10:19:12.151Z",
+      "renewedAt": "2026-11-08T00:20:52Z"
+    },
+    "summit-tulip-wy8b": {
+      "siteUrl": "https://summit-tulip-wy8b.here.now/",
+      "claimToken": "GZuvDwHkuL7IjUXT",
+      "claimUrl": "https://here.now/c/GZuvDwHkuL7IjUXT",
+      "expiresAt": "2026-11-09T11:13:39.934Z"
+    },
+    "russet-koan-3zy3": {
+      "siteUrl": "https://russet-koan-3zy3.here.now/",
+      "claimToken": "2wbIwq3i2pdNS7s0",
+      "claimUrl": "https://here.now/c/2wbIwq3i2pdNS7s0",
+      "expiresAt": "2026-11-10T00:34:22.574Z",
+      "renewedAt": "2026-11-09T00:35:24Z"
     }
   }
 }

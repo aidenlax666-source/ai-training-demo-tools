@@ -1,11 +1,24 @@
 {
   "publishes": {
-    "sturdy-canvas-e6wb": {
-      "siteUrl": "https://sturdy-canvas-e6wb.here.now/",
-      "claimToken": "3Zp2C42wZwPBbSaW",
-      "claimUrl": "https://here.now/c/3Zp2C42wZwPBbSaW",
-      "expiresAt": "2026-11-08T06:58:00Z",
-      "renewedAt": "2026-11-07T06:58:00Z"
+    "lemon-castle-bcn6": {
+      "siteUrl": "https://lemon-castle-bcn6.here.now/",
+      "claimToken": "Da3G6qkVAeHE0qzE",
+      "claimUrl": "https://here.now/c/Da3G6qkVAeHE0qzE",
+      "expiresAt": "2026-11-08T10:19:21.526Z",
+      "renewedAt": "2026-11-08T00:20:52Z"
+    },
+    "kindly-opera-9y36": {
+      "siteUrl": "https://kindly-opera-9y36.here.now/",
+      "claimToken": "Lr8a0pYTQ6Z5aNcD",
+      "claimUrl": "https://here.now/c/Lr8a0pYTQ6Z5aNcD",
+      "expiresAt": "2026-11-09T11:13:46.948Z"
+    },
+    "plush-garden-3gbr": {
+      "siteUrl": "https://plush-garden-3gbr.here.now/",
+      "claimToken": "WnIXl7fDqGzlDrDA",
+      "claimUrl": "https://here.now/c/WnIXl7fDqGzlDrDA",
+      "expiresAt": "2026-11-10T00:34:32.288Z",
+      "renewedAt": "2026-11-09T00:35:24Z"
     }
   }
 }

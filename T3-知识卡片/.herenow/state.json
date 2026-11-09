@@ -1,11 +1,24 @@
 {
   "publishes": {
-    "jovial-tangle-d3py": {
-      "siteUrl": "https://jovial-tangle-d3py.here.now/",
-      "claimToken": "85H7Lq0sjeJpdmyf",
-      "claimUrl": "https://here.now/c/85H7Lq0sjeJpdmyf",
-      "expiresAt": "2026-11-08T06:58:00Z",
-      "renewedAt": "2026-11-07T06:58:00Z"
+    "spruce-atlas-g5gd": {
+      "siteUrl": "https://spruce-atlas-g5gd.here.now/",
+      "claimToken": "j2hPO-83kjn9Vd07",
+      "claimUrl": "https://here.now/c/j2hPO-83kjn9Vd07",
+      "expiresAt": "2026-11-08T10:19:17.482Z",
+      "renewedAt": "2026-11-08T00:20:52Z"
+    },
+    "hearty-medley-e9rk": {
+      "siteUrl": "https://hearty-medley-e9rk.here.now/",
+      "claimToken": "yR7unzA-O_GwFTk-",
+      "claimUrl": "https://here.now/c/yR7unzA-O_GwFTk-",
+      "expiresAt": "2026-11-09T11:13:43.539Z"
+    },
+    "silken-banner-mnn9": {
+      "siteUrl": "https://silken-banner-mnn9.here.now/",
+      "claimToken": "yliwkVTrJT81wfx8",
+      "claimUrl": "https://here.now/c/yliwkVTrJT81wfx8",
+      "expiresAt": "2026-11-10T00:34:27.126Z",
+      "renewedAt": "2026-11-09T00:35:24Z"
     }
   }
 }

@@ -1,11 +1,24 @@
 {
   "publishes": {
-    "queued-bodhi-tx3x": {
-      "siteUrl": "https://queued-bodhi-tx3x.here.now/",
-      "claimToken": "vzh_BiNhihmKS_A0",
-      "claimUrl": "https://here.now/c/vzh_BiNhihmKS_A0",
-      "expiresAt": "2026-11-08T06:58:00Z",
-      "renewedAt": "2026-11-07T06:58:00Z"
+    "marble-zinnia-2rcn": {
+      "siteUrl": "https://marble-zinnia-2rcn.here.now/",
+      "claimToken": "U7ETtLD5nss1jLih",
+      "claimUrl": "https://here.now/c/U7ETtLD5nss1jLih",
+      "expiresAt": "2026-11-08T10:19:26.004Z",
+      "renewedAt": "2026-11-08T00:20:52Z"
+    },
+    "lively-sierra-272p": {
+      "siteUrl": "https://lively-sierra-272p.here.now/",
+      "claimToken": "aK9RAcGiy6MATm8o",
+      "claimUrl": "https://here.now/c/aK9RAcGiy6MATm8o",
+      "expiresAt": "2026-11-09T11:13:50.660Z"
+    },
+    "amber-ginger-z85y": {
+      "siteUrl": "https://amber-ginger-z85y.here.now/",
+      "claimToken": "Trh9i0xuYb8b7ryQ",
+      "claimUrl": "https://here.now/c/Trh9i0xuYb8b7ryQ",
+      "expiresAt": "2026-11-10T00:34:37.025Z",
+      "renewedAt": "2026-11-09T00:35:24Z"
     }
   }
 }

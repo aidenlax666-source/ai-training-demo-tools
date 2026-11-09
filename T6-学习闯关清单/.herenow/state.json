@@ -1,11 +1,24 @@
 {
   "publishes": {
-    "saffron-sphinx-9vf7": {
-      "siteUrl": "https://saffron-sphinx-9vf7.here.now/",
-      "claimToken": "DOOwF62ogb8lCoLt",
-      "claimUrl": "https://here.now/c/DOOwF62ogb8lCoLt",
-      "expiresAt": "2026-11-08T06:58:00Z",
-      "renewedAt": "2026-11-07T06:58:00Z"
+    "fern-quiche-e68m": {
+      "siteUrl": "https://fern-quiche-e68m.here.now/",
+      "claimToken": "TGDn0FWri4aqUqlA",
+      "claimUrl": "https://here.now/c/TGDn0FWri4aqUqlA",
+      "expiresAt": "2026-11-08T10:19:30.239Z",
+      "renewedAt": "2026-11-08T00:20:52Z"
+    },
+    "serene-poplar-t4kj": {
+      "siteUrl": "https://serene-poplar-t4kj.here.now/",
+      "claimToken": "2NwunXBUxlT_lkQL",
+      "claimUrl": "https://here.now/c/2NwunXBUxlT_lkQL",
+      "expiresAt": "2026-11-09T11:13:54.121Z"
+    },
+    "wistful-wisdom-m4r9": {
+      "siteUrl": "https://wistful-wisdom-m4r9.here.now/",
+      "claimToken": "8pr0RKbypnYnH47y",
+      "claimUrl": "https://here.now/c/8pr0RKbypnYnH47y",
+      "expiresAt": "2026-11-10T00:34:41.449Z",
+      "renewedAt": "2026-11-09T00:35:24Z"
     }
   }
 }

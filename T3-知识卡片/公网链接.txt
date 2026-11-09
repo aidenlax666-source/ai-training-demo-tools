@@ -1,4 +1,4 @@
-短时效演示: https://jovial-tangle-d3py.here.now/
-约到期(Asia/Shanghai): 2026-11-08 14:58
-认领永久: https://here.now/c/85H7Lq0sjeJpdmyf
-续约时间: 2026-11-07 ~14:58 Asia/Shanghai
+演示：https://silken-banner-mnn9.here.now/
+认领（Google 登录后永久）：https://here.now/c/yliwkVTrJT81wfx8
+约到期（UTC）：2026-11-10T00:34:27.126Z
+约到期（Asia/Shanghai）：2026-11-10 08:34

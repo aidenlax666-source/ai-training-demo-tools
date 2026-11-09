@@ -1,4 +1,4 @@
-短时效演示: https://saffron-sphinx-9vf7.here.now/
-约到期(Asia/Shanghai): 2026-11-08 14:58
-认领永久: https://here.now/c/DOOwF62ogb8lCoLt
-续约时间: 2026-11-07 ~14:58 Asia/Shanghai
+演示：https://wistful-wisdom-m4r9.here.now/
+认领（Google 登录后永久）：https://here.now/c/8pr0RKbypnYnH47y
+约到期（UTC）：2026-11-10T00:34:41.449Z
+约到期（Asia/Shanghai）：2026-11-10 08:34
